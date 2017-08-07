@@ -1,0 +1,96 @@
+{% extends 'core/base.html' %}
+{% load app_filters %}
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header" data-background-color="green">
+                <h4 class="card-title">
+                    Listagem de {{ object_list.model|verbose_name_plural|title }}
+                </h4>
+            </div>
+            <div class="card-content table-responsive">
+                <a href="{{ object_list.model.get_add_url }}" role="button" class="btn btn-info btn-sm bottom-right"><i class="glyphicon-plus"></i> Adicionar</a>
+                <table class="table">
+                    <thead class="text-primary">
+                        <th>#</th>
+
+                        {% if object_list.model.list_display_title %}
+                        {% for field in object_list.model.list_display_title %}
+                            <th>{{ field.verbose_name|upper }}</th>
+                        {% endfor %}
+                        {% else %}
+                            <th>{{ object_list.model|verbose_name|upper }}</th>
+                        {% endif %}
+
+                        <th></th>
+                    </thead>
+                    <tbody>
+                    {% for obj in object_list %}
+                        <tr>
+                            <th scope="row">{{ obj.pk }}</th>
+
+                            {% if obj.list_display_value %}
+                            {% for value in obj.list_display_value %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                            {% else %}
+                                <td>{{ obj }}</td>
+                            {% endif %}
+
+                            <td>
+                                <a href="{{ obj.get_edit_url }}" role="button" class="btn btn-warning btn-xs">Editar</a>
+                                <a href="#" role="button" class="btn btn-danger btn-xs">Excluir</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    {% comment %}
+    <div class="table-responsive">
+        <table class="table table-striped table-condensed">
+            <caption>Listagem de {{ object_list.model|verbose_name_plural|title }}.</caption>
+            <thead>
+                <tr>
+                    <th>#</th>
+
+                    {% if object_list.model.list_display_title %}
+                    {% for field in object_list.model.list_display_title %}
+                        <th>{{ field.verbose_name|upper }}</th>
+                    {% endfor %}
+                    {% else %}
+                        <th>{{ object_list.model|verbose_name|upper }}</th>
+                    {% endif %}
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for obj in object_list %}
+                <tr>
+                    <th scope="row">{{ obj.pk }}</th>
+
+                    {% if obj.list_display_value %}
+                    {% for value in obj.list_display_value %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                    {% else %}
+                        <td>{{ obj }}</td>
+                    {% endif %}
+
+                    <td>
+                        <a href="{% block url_edit %}{% endblock %}" role="button" class="btn btn-warning btn-xs">Editar</a>
+                        <a href="{% block url_delete %}{% endblock %}" role="button" class="btn btn-danger btn-xs">Excluir</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endcomment %}
+{% endblock content %}

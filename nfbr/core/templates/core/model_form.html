@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% load app_filters %}
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="card">
+            <form action="" method="post" class="form-horizontal">
+                {% csrf_token %}
+
+                <div class="card-header " data-background-color="green">
+                    <h4 class="card-title">{{ form.instance|verbose_name|title }}</h4>
+                </div>
+
+                <div class="card-content">
+                    {{ form.non_field_errors }}
+
+                    {% for field in form %}
+                        <div class="row">
+                            <label class="col-sm-2 label-on-left" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <div class="col-sm-10">
+                                <div class="form-group label-floating is-empty">
+                                    <label class="control-label"></label>
+                                    {{ field.errors }}
+                                    {{ field|addcss:'form-control' }}
+                                    <span class="material-input"></span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="card-footer text-center">
+                    <input type="submit" class="btn btn-success btn-fill" value="Gravar" />
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
