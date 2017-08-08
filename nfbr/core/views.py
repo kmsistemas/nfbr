@@ -5,7 +5,7 @@ from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, Tbentrada
 from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto
 
 
-home = TemplateView.as_view(template_name='core/index.html')
+home = TemplateView.as_view(template_name='index.html')
 
 
 list_contribuinte = ListView.as_view(model=Tbcontribuinte,
@@ -14,13 +14,15 @@ list_contribuinte = ListView.as_view(model=Tbcontribuinte,
 
 create_contribuinte = CreateView.as_view(model=Tbcontribuinte,
                                          form_class=TbcontribuinteForm,
-                                         template_name='core/model_form.html')
+                                         # template_name='core/model_form.html'
+                                         )
 
 
 update_contribuinte = UpdateView.as_view(model=Tbcontribuinte,
                                          form_class=TbcontribuinteForm,
                                          success_url=reverse_lazy('list_contribuinte'),
-                                         template_name='core/model_form.html')
+                                         # template_name='core/model_form.html'
+                                         )
 
 
 list_cfop = ListView.as_view(model=Tbcfop,
@@ -78,6 +80,6 @@ create_produto = CreateView.as_view(model=Tbproduto,
 
 
 update_produto = UpdateView.as_view(model=Tbproduto,
-                                       form_class=TbprodutoForm,
-                                       success_url=reverse_lazy('list_produto'),
-                                       template_name='core/model_form.html')
+                                    form_class=TbprodutoForm,
+                                    success_url=reverse_lazy('list_produto'),
+                                    template_name='core/model_form.html')

@@ -49,6 +49,8 @@ class UserChangeForm(forms.ModelForm):
 
 
 class TbcontribuinteForm(forms.ModelForm):
+    senha_email_nfce = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = Tbcontribuinte
         fields = '__all__'

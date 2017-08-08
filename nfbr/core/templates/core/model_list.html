@@ -1,4 +1,4 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 {% load app_filters %}
 
 {% block content %}
@@ -11,7 +11,7 @@
             </div>
             <div class="card-content table-responsive">
                 <a href="{{ object_list.model.get_add_url }}" role="button" class="btn btn-info btn-sm bottom-right"><i class="glyphicon-plus"></i> Adicionar</a>
-                <table class="table">
+                <table class="table table-list-km">
                     <thead class="text-primary">
                         <th>#</th>
 
@@ -39,8 +39,14 @@
                             {% endif %}
 
                             <td>
-                                <a href="{{ obj.get_edit_url }}" role="button" class="btn btn-warning btn-xs">Editar</a>
-                                <a href="#" role="button" class="btn btn-danger btn-xs">Excluir</a>
+                                <a href="{{ obj.get_edit_url }}" role="button" class="btn btn-warning btn-xs"
+                                   data-toggle="tooltip" title="Editar">
+                                    <i class="material-icons">mode_edit</i>
+                                </a>
+                                <a href="#" role="button" class="btn btn-danger btn-xs"
+                                   data-toggle="tooltip" title="Excluir">
+                                    <i class="material-icons">delete_forever</i>
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

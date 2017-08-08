@@ -1,0 +1,128 @@
+{% extends 'core/model_form.html' %}
+{% load app_filters %}
+
+{% block model_form_field %}
+
+    <ul class="nav nav-pills nav-pills-info">
+        <li class="active">
+            <a href="#pill_dados" data-toggle="tab">Dados</a>
+        </li>
+        <li>
+            <a href="#pill_tributacao" data-toggle="tab">Tributação</a>
+        </li>
+        <li>
+            <a href="#pill_usuarios" data-toggle="tab">Usuários</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="pill_dados">
+
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.razao class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.fantasia class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.cep class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.logradouro class_column=col4 %}
+            {% include 'core/model_form_field.html' with field=form.nro_logradouro class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.complemento class_column=col3 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.bairro class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.municipio class_column=col4 %}
+            {% include 'core/model_form_field.html' with field=form.ibge_municipio class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.id_uf class_column=col3 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.fone class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.fax class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.cnpj class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.ie class_column=col3 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.email class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.validade_licenca class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.controla_financeiro class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.controla_estoque class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.orcamento class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.tipo_imp_orcamento class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.ambiente class_column=col2 %}
+            {% include 'row_end.html' %}
+
+
+        </div>
+        <div class="tab-pane" id="pill_tributacao">
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.regime_tributario class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.certificado class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.fuso_horario class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.numero_inicial_nfce class_column=col3 %}
+            {% include 'core/model_form_field.html' with field=form.tipo_impressao_nfce class_column=col6 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.id_token_nfce class_column=col2 %}
+            {% include 'core/model_form_field.html' with field=form.codigo_token_nfce class_column=col10 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.servidor_email_nfce class_column=col8 %}
+            {% include 'core/model_form_field.html' with field=form.porta_email_nfce class_column=col4 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.login_email_nfce class_column=col6 %}
+            {% include 'core/model_form_field.html' with field=form.senha_email_nfce class_column=col6 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.timeout_email_nfce class_column=col6 %}
+            {% include 'core/model_form_field.html' with field=form.requer_autenticacao_email_nfce class_column=col6 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.remetente_email_nfce class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.cc_email_nfce class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.cco_email_nfce class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.assunto_email_nfce class_column=col12 %}
+            {% include 'row_end.html' %}
+
+            {% include 'row_begin.html' %}
+            {% include 'core/model_form_field.html' with field=form.mensagem_email_nfce class_column=col12 %}
+            {% include 'row_end.html' %}
+
+        </div>
+        <div class="tab-pane" id="pill_usuarios">
+            ...
+        </div>
+    </div>
+
+{% endblock model_form_field %}

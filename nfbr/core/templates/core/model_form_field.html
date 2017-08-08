@@ -1,0 +1,26 @@
+{% load app_filters %}
+
+<!-- <div class="row"> -->
+
+<div class="{% if class_column %}{{ class_column }}{% else %}col-md-12{% endif %}" xmlns="http://www.w3.org/1999/html">
+        <div class="form-group form-group-sm label-floating">
+            <label class="control-label">{{ field.label }}</label>
+            {% for error in field.errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
+            {{ field|addcss:'form-control' }}
+        </div>
+    </div>
+
+    {% comment %}
+    <label class="col-sm-2 label-on-left control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    <div class="{% if class_column %}{{ class_column }}{% else %}col-sm-10{% endif %}">
+        <div class="form-group form-group-sm form-group-km label-floating is-empty">
+            <label class="control-label"></label>
+            {{ field.errors }}
+            {{ field|addcss:'form-control' }}
+            <span class="material-input"></span>
+        </div>
+    </div>
+    {% endcomment %}
+<!-- </div> -->

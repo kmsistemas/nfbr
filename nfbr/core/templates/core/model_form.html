@@ -1,4 +1,4 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 {% load app_filters %}
 
 {% block content %}
@@ -14,23 +14,23 @@
                 <div class="card-content">
                     {{ form.non_field_errors }}
 
-                    {% for field in form %}
-                        <div class="row">
-                            <label class="col-sm-2 label-on-left" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            <div class="col-sm-10">
-                                <div class="form-group label-floating is-empty">
-                                    <label class="control-label"></label>
-                                    {{ field.errors }}
-                                    {{ field|addcss:'form-control' }}
-                                    <span class="material-input"></span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+                    {% with col12='col-md-12' col10='col-md-10' col8='col-md-8' col6='col-md-6' col4='col-md-4' col3='col-md-3' col2='col-md-2' %}
+
+                        {% block model_form_field %}
+                            {% include 'row_begin.html' %}
+                            {% for field in form %}
+                                {% include 'core/model_form_field.html' %}
+                            {% endfor %}
+                            {% include 'row_end.html' %}
+                        {% endblock model_form_field %}
+
+                    {% endwith %}
                 </div>
 
                 <div class="card-footer text-center">
-                    <input type="submit" class="btn btn-success btn-fill" value="Gravar" />
+                    <div class="col-sm-12">
+                        <input type="submit" class="btn btn-success btn-fill" value="Gravar" />
+                    </div>
                 </div>
             </form>
         </div>

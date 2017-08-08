@@ -13,3 +13,15 @@
 
  */
 
+.table-list-km > thead > tr > th,
+.table-list-km > tbody > tr > th,
+.table-list-km > tfoot > tr > th,
+.table-list-km > thead > tr > td,
+.table-list-km > tbody > tr > td,
+.table-list-km > tfoot > tr > td {
+    padding: 3px 3px !important;
+}
+
+/*.form-group-km {*/
+    /*padding-bottom: 1px !important;*/
+/*}*/

@@ -8,7 +8,13 @@ from django.shortcuts import resolve_url as r
 from nfbr.core.managers import TbusuarioManager
 
 
-class CustomModel:
+SIM_NAO_CHOICES = (
+    ('S', 'Sim'),
+    ('N', 'Não'),
+)
+
+
+class CustomModel(models.Model):
     def list_display(self):
         return []
 
@@ -18,8 +24,11 @@ class CustomModel:
     def list_display_value(self):
         return [(getattr(self, field)) for field in self.list_display()]
 
+    class Meta:
+        abstract = True
 
-class Tbcfop(models.Model, CustomModel):
+
+class Tbcfop(CustomModel):
     id_cfop = models.AutoField(primary_key=True)
     codigo = models.CharField(unique=True, max_length=4)
     descricao = models.CharField(max_length=120)
@@ -34,13 +43,15 @@ class Tbcfop(models.Model, CustomModel):
     def __str__(self):
         return self.codigo
 
-    def get_add_url(self):
+    @staticmethod
+    def get_add_url():
         return r('create_cfop')
 
     def get_edit_url(self):
         return r('update_cfop', self.pk)
 
-    def get_menu(self):
+    @staticmethod
+    def get_menu():
         return 'tbcfop'
 
     def list_display(self):
@@ -50,50 +61,69 @@ class Tbcfop(models.Model, CustomModel):
         ]
 
 
-class Tbcontribuinte(models.Model, CustomModel):
+class Tbcontribuinte(CustomModel):
     id_contribuinte = models.AutoField(primary_key=True)
-    razao = models.CharField('razão', max_length=120)
-    fantasia = models.CharField(max_length=120, blank=True, null=True)
+    razao = models.CharField('razão social', max_length=120)
+    fantasia = models.CharField('nome fantasia', max_length=120, blank=True, null=True)
     situacao = models.CharField(max_length=1)
     cep = models.CharField(max_length=10, blank=True, null=True)
     logradouro = models.CharField(max_length=60, blank=True, null=True)
     nro_logradouro = models.CharField(max_length=60, blank=True, null=True)
     complemento = models.CharField(max_length=60, blank=True, null=True)
     bairro = models.CharField(max_length=60, blank=True, null=True)
-    municipio = models.CharField(max_length=60, blank=True, null=True)
-    ibge_municipio = models.CharField(max_length=7, blank=True, null=True)
-    fone = models.CharField(max_length=20, blank=True, null=True)
+    municipio = models.CharField('município', max_length=60, blank=True, null=True)
+    ibge_municipio = models.CharField('IBGE município', max_length=7, blank=True, null=True)
+    fone = models.CharField('telefone', max_length=20, blank=True, null=True)
     fax = models.CharField(max_length=20, blank=True, null=True)
     cnpj = models.CharField(unique=True, max_length=20, blank=True, null=True)
     ie = models.CharField(max_length=20, blank=True, null=True)
     email = models.CharField(max_length=60, blank=True, null=True)
-    regime_tributario = models.CharField(max_length=1, blank=True, null=True)
-    id_token_nfce = models.CharField(max_length=20, blank=True, null=True)
-    codigo_token_nfce = models.CharField(max_length=60, blank=True, null=True)
-    servidor_email_nfce = models.CharField(max_length=100, blank=True, null=True)
-    porta_email_nfce = models.CharField(max_length=4, blank=True, null=True)
-    login_email_nfce = models.CharField(max_length=60, blank=True, null=True)
-    senha_email_nfce = models.CharField(max_length=60, blank=True, null=True)
-    requer_autenticacao_email_nfce = models.NullBooleanField()
-    timeout_email_nfce = models.IntegerField(blank=True, null=True)
-    remetente_email_nfce = models.CharField(max_length=60, blank=True, null=True)
-    assunto_email_nfce = models.CharField(max_length=120, blank=True, null=True)
-    cc_email_nfce = models.CharField(max_length=200, blank=True, null=True)
-    cco_email_nfce = models.CharField(max_length=200, blank=True, null=True)
-    mensagem_email_nfce = models.TextField(blank=True, null=True)
-    id_uf = models.ForeignKey('Tbuf', models.DO_NOTHING, db_column='id_uf', blank=True, null=True)
-    validade_licenca = models.DateField(blank=True, null=True)
-    ambiente = models.IntegerField()
+    REGIME_TRIBUTARIO_CHOICES = (
+        ('1', '1 - Simples Nacional'),
+        ('2', '2 - Simples Nacional (Excesso de sublimite de receita bruta)'),
+        ('3', '3 - Regime Normal'),
+    )
+    regime_tributario = models.CharField('regime tributário', max_length=1, blank=True, null=True, choices=REGIME_TRIBUTARIO_CHOICES)
+    id_token_nfce = models.CharField('id. token', max_length=20, blank=True, null=True)
+    codigo_token_nfce = models.CharField('código token', max_length=60, blank=True, null=True)
+    servidor_email_nfce = models.CharField('servidor de envio de e-mail (SMTP)', max_length=100, blank=True, null=True)
+    porta_email_nfce = models.CharField('porta de envio de e-mail', max_length=4, blank=True, null=True)
+    login_email_nfce = models.CharField('login e-mail', max_length=60, blank=True, null=True)
+    senha_email_nfce = models.CharField('senha e-mail', max_length=60, blank=True, null=True)
+    requer_autenticacao_email_nfce = models.NullBooleanField('requerido autenticação e-mail')
+    timeout_email_nfce = models.IntegerField('tempo de espera e-mail', blank=True, null=True)
+    remetente_email_nfce = models.CharField('remetente e-mail', max_length=60, blank=True, null=True)
+    assunto_email_nfce = models.CharField('assunto e-mail', max_length=120, blank=True, null=True)
+    cc_email_nfce = models.CharField('Com Cópia e-mail', max_length=200, blank=True, null=True)
+    cco_email_nfce = models.CharField('Com Cópia Oculta e-mail', max_length=200, blank=True, null=True)
+    mensagem_email_nfce = models.TextField('mensagem e-mail', blank=True, null=True)
+    id_uf = models.ForeignKey('Tbuf', models.DO_NOTHING, verbose_name='estado', db_column='id_uf', blank=True,
+                              null=True)
+    validade_licenca = models.DateField('validade licença', blank=True, null=True)
+    AMBIENTE_CHOICES = (
+        (1, 'Produção'),
+        (2, 'Homologação'),
+    )
+    ambiente = models.IntegerField(choices=AMBIENTE_CHOICES)
     certificado = models.CharField(max_length=255, blank=True, null=True)
-    fuso_horario = models.CharField(max_length=6)
-    numero_inicial_nfce = models.IntegerField()
-    tipo_impressao_nfce = models.CharField(max_length=1)
-    controla_estoque = models.CharField(max_length=1)
-    controla_financeiro = models.CharField(max_length=1)
-    orcamento = models.CharField(max_length=1)
+    fuso_horario = models.CharField('fuso horário', max_length=6)
+    numero_inicial_nfce = models.IntegerField('número inicial')
+    TIPO_IMPRESSAO_NFCE_CHOICES = (
+        ('1', 'Direta'),
+        ('2', 'Imprime'),
+        ('3', 'Visualiza'),
+    )
+    tipo_impressao_nfce = models.CharField('tipo de impressão', max_length=1, choices=TIPO_IMPRESSAO_NFCE_CHOICES)
+    controla_estoque = models.CharField(max_length=1, choices=SIM_NAO_CHOICES)
+    controla_financeiro = models.CharField(max_length=1, choices=SIM_NAO_CHOICES)
+    orcamento = models.CharField('controla orçamento', max_length=1, choices=SIM_NAO_CHOICES)
     financeiro_km_gerado = models.CharField(max_length=1, blank=True, null=True)
     ultimo_aviso = models.DateField(blank=True, null=True)
-    tipo_imp_orcamento = models.CharField(max_length=1, blank=True, null=True)
+    TIPO_IMPRESSAO_ORCAMENTO_CHOICES = (
+        ('1', 'A4'),
+        ('2', 'Cupom'),
+    )
+    tipo_imp_orcamento = models.CharField('tipo orçamento', max_length=1, blank=True, null=True, choices=TIPO_IMPRESSAO_ORCAMENTO_CHOICES)
 
     class Meta:
         managed = False
@@ -104,13 +134,15 @@ class Tbcontribuinte(models.Model, CustomModel):
     def __str__(self):
         return self.razao
 
-    def get_add_url(self):
+    @staticmethod
+    def get_add_url():
         return r('create_contribuinte')
 
     def get_edit_url(self):
         return r('update_contribuinte', self.pk)
 
-    def get_menu(self):
+    @staticmethod
+    def get_menu():
         return 'tbcontribuinte'
 
     def list_display(self):
@@ -121,7 +153,7 @@ class Tbcontribuinte(models.Model, CustomModel):
         ]
 
 
-class Tbcst(models.Model, CustomModel):
+class Tbcst(CustomModel):
     id_cst = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=3)
     tipo = models.CharField(max_length=1)
@@ -137,13 +169,15 @@ class Tbcst(models.Model, CustomModel):
     def __str__(self):
         return self.codigo
 
-    def get_add_url(self):
+    @staticmethod
+    def get_add_url():
         return r('create_cst')
 
     def get_edit_url(self):
         return r('update_cst', self.pk)
 
-    def get_menu(self):
+    @staticmethod
+    def get_menu():
         return 'tbcst'
 
     def list_display(self):
@@ -153,7 +187,7 @@ class Tbcst(models.Model, CustomModel):
         ]
 
 
-class TbentradaNf(models.Model, CustomModel):
+class TbentradaNf(CustomModel):
     id_entrada_nf = models.AutoField(primary_key=True)
     data_nf = models.DateField()
     id_pessoa = models.ForeignKey('Tbpessoa', models.DO_NOTHING, db_column='id_pessoa')
@@ -169,13 +203,15 @@ class TbentradaNf(models.Model, CustomModel):
     def __str__(self):
         return self.id_entrada_nf
 
-    def get_add_url(self):
+    @staticmethod
+    def get_add_url():
         return r('create_entrada_nf')
 
     def get_edit_url(self):
         return r('update_entrada_nf', self.pk)
 
-    def get_menu(self):
+    @staticmethod
+    def get_menu():
         return 'tbentradanf'
 
     def list_display(self):
@@ -185,7 +221,7 @@ class TbentradaNf(models.Model, CustomModel):
         ]
 
 
-class TbentradaNfItem(models.Model, CustomModel):
+class TbentradaNfItem(CustomModel):
     id_entrada_nf_item = models.AutoField(primary_key=True)
     id_entrada_nf = models.ForeignKey(TbentradaNf, models.DO_NOTHING, db_column='id_entrada_nf')
     id_produto = models.ForeignKey('Tbproduto', models.DO_NOTHING, db_column='id_produto')
@@ -197,7 +233,7 @@ class TbentradaNfItem(models.Model, CustomModel):
         db_table = 'tbentrada_nf_item'
 
 
-# class Tberros(models.Model, CustomModel):
+# class Tberros(CustomModel):
 #     id_erro = models.AutoField(primary_key=True)
 #     mensagem = models.TextField(unique=True)
 #     traducao = models.TextField(blank=True, null=True)
@@ -211,7 +247,7 @@ class TbentradaNfItem(models.Model, CustomModel):
 #         db_table = 'tberros'
 
 
-class TbitmodVenda(models.Model, CustomModel):
+class TbitmodVenda(CustomModel):
     id_itmod_venda = models.AutoField(primary_key=True)
     quantidade = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     preco = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
@@ -224,7 +260,7 @@ class TbitmodVenda(models.Model, CustomModel):
         db_table = 'tbitmod_venda'
 
 
-class Tbitnfe(models.Model, CustomModel):
+class Tbitnfe(CustomModel):
     id_itnfe = models.AutoField(primary_key=True)
     qcom_i10 = models.DecimalField(max_digits=65535, decimal_places=65535)
     vuncom_i10a = models.DecimalField(max_digits=65535, decimal_places=65535)
@@ -294,7 +330,7 @@ class Tbitnfe(models.Model, CustomModel):
 #         db_table = 'tblog'
 
 
-class TbmodVenda(models.Model, CustomModel):
+class TbmodVenda(CustomModel):
     id_mod_venda = models.AutoField(primary_key=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     descricao = models.CharField(max_length=60, blank=True, null=True)
@@ -314,7 +350,7 @@ class TbmodVenda(models.Model, CustomModel):
         ]
 
 
-class Tbncm(models.Model, CustomModel):
+class Tbncm(CustomModel):
     id_ncm = models.AutoField(primary_key=True)
     codigo = models.CharField(unique=True, max_length=8)
     descricao = models.TextField()
@@ -335,7 +371,7 @@ class Tbncm(models.Model, CustomModel):
         ]
 
 
-class TbncmIbpt(models.Model, CustomModel):
+class TbncmIbpt(CustomModel):
     id_ncm_ibpt = models.AutoField(primary_key=True)
     codigo_ncm = models.CharField(max_length=8)
     id_uf = models.ForeignKey('Tbuf', models.DO_NOTHING, db_column='id_uf')
@@ -351,7 +387,7 @@ class TbncmIbpt(models.Model, CustomModel):
         db_table = 'tbncm_ibpt'
 
 
-class Tbnfe(models.Model, CustomModel):
+class Tbnfe(CustomModel):
     id_nfe = models.AutoField(primary_key=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_pessoa = models.ForeignKey('Tbpessoa', models.DO_NOTHING, db_column='id_pessoa', blank=True, null=True)
@@ -430,7 +466,7 @@ class Tbnfe(models.Model, CustomModel):
         ]
 
 
-class TbnfeInutilizada(models.Model, CustomModel):
+class TbnfeInutilizada(CustomModel):
     id_nfe_inutilizada = models.AutoField(primary_key=True)
     ano = models.IntegerField()
     modelo = models.IntegerField()
@@ -448,7 +484,7 @@ class TbnfeInutilizada(models.Model, CustomModel):
         db_table = 'tbnfe_inutilizada'
 
 
-class Tbpessoa(models.Model, CustomModel):
+class Tbpessoa(CustomModel):
     id_pessoa = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=120, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
@@ -484,22 +520,24 @@ class Tbpessoa(models.Model, CustomModel):
         ]
 
 
-class Tbproduto(models.Model, CustomModel):
+class Tbproduto(CustomModel):
     id_produto = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=20)
-    descricao = models.CharField(max_length=120)
+    descricao = models.CharField('descrição', max_length=120)
     situacao = models.CharField(max_length=1)
     preco_venda = models.DecimalField(max_digits=65535, decimal_places=65535)
     origem = models.IntegerField()
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_unidade_medida = models.ForeignKey('TbunidadeMedida', models.DO_NOTHING, db_column='id_unidade_medida')
     id_ncm = models.ForeignKey(Tbncm, models.DO_NOTHING, db_column='id_ncm')
-    id_tributacao = models.ForeignKey('Tbtributacao', models.DO_NOTHING, db_column='id_tributacao', blank=True, null=True)
+    id_tributacao = models.ForeignKey('Tbtributacao', models.DO_NOTHING, db_column='id_tributacao', blank=True,
+                                      null=True)
     id_cst_icms = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_icms', related_name='produtosIcms')
     aliq_icms = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     id_cst_pis = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_pis', related_name='produtosPis')
     aliq_pis = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    id_cst_cofins = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_cofins', related_name='produtosCofins')
+    id_cst_cofins = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_cofins',
+                                      related_name='produtosCofins')
     aliq_cofins = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     id_cfop = models.ForeignKey(Tbcfop, models.DO_NOTHING, db_column='id_cfop', blank=True, null=True)
     cod_barra = models.CharField(max_length=14, blank=True, null=True)
@@ -522,23 +560,26 @@ class Tbproduto(models.Model, CustomModel):
     def __str__(self):
         return self.descricao
 
-    def get_add_url(self):
+    @staticmethod
+    def get_add_url():
         return r('create_produto')
 
     def get_edit_url(self):
         return r('update_produto', self.pk)
 
-    def get_menu(self):
+    @staticmethod
+    def get_menu():
         return 'tbproduto'
 
     def list_display(self):
         return [
             'codigo',
             'descricao',
+            'saldo_estoque'
         ]
 
 
-class TbtempProd(models.Model, CustomModel):
+class TbtempProd(CustomModel):
     id_contribuinte = models.BigIntegerField(blank=True, null=True)
     codigo = models.CharField(max_length=20, blank=True, null=True)
     produto = models.CharField(max_length=60, blank=True, null=True)
@@ -552,7 +593,7 @@ class TbtempProd(models.Model, CustomModel):
         db_table = 'tbtemp_prod'
 
 
-class Tbtitulo(models.Model, CustomModel):
+class Tbtitulo(CustomModel):
     id_titulo = models.AutoField(primary_key=True)
     tipo = models.CharField(max_length=1)
     codigo = models.CharField(max_length=120, blank=True, null=True)
@@ -588,7 +629,7 @@ class Tbtitulo(models.Model, CustomModel):
         ]
 
 
-class Tbtributacao(models.Model, CustomModel):
+class Tbtributacao(CustomModel):
     id_tributacao = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=20)
     descricao = models.CharField(max_length=120)
@@ -596,7 +637,8 @@ class Tbtributacao(models.Model, CustomModel):
     aliq_icms = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     id_cst_pis = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_pis', related_name='tributacoesPis')
     aliq_pis = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    id_cst_cofins = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_cofins', related_name='tributacoesCofins')
+    id_cst_cofins = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_cofins',
+                                      related_name='tributacoesCofins')
     aliq_cofins = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_cfop = models.ForeignKey(Tbcfop, models.DO_NOTHING, db_column='id_cfop')
@@ -620,7 +662,7 @@ class Tbtributacao(models.Model, CustomModel):
         ]
 
 
-class Tbuf(models.Model, CustomModel):
+class Tbuf(CustomModel):
     id_uf = models.AutoField(primary_key=True)
     sigla = models.CharField(unique=True, max_length=2)
     descricao = models.CharField(max_length=60)
@@ -643,7 +685,7 @@ class Tbuf(models.Model, CustomModel):
         ]
 
 
-class TbunidadeMedida(models.Model, CustomModel):
+class TbunidadeMedida(CustomModel):
     id_unidade_medida = models.AutoField(primary_key=True)
     sigla = models.CharField(unique=True, max_length=6)
     descricao = models.CharField(unique=True, max_length=30)
@@ -690,8 +732,11 @@ class Tbusuario(AbstractBaseUser, PermissionsMixin, CustomModel):
     def get_short_name(self):
         return self.nome
 
+    def get_full_name(self):
+        return self.nome
 
-class TbusuarioContribuinte(models.Model, CustomModel):
+
+class TbusuarioContribuinte(CustomModel):
     id_usuario = models.ForeignKey(Tbusuario, models.DO_NOTHING, db_column='id_usuario', primary_key=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
 
@@ -701,7 +746,7 @@ class TbusuarioContribuinte(models.Model, CustomModel):
         unique_together = (('id_usuario', 'id_contribuinte'),)
 
 
-# class Tbviewlog(models.Model, CustomModel):
+# class Tbviewlog(CustomModel):
 #     nome_tabela = models.CharField(primary_key=True, max_length=60)
 #     nome_campo = models.CharField(max_length=60)
 #     descricao_campo = models.CharField(max_length=60, blank=True, null=True)
@@ -713,7 +758,7 @@ class TbusuarioContribuinte(models.Model, CustomModel):
 #         unique_together = (('nome_tabela', 'nome_campo'),)
 
 
-# class Tmpuser(models.Model, CustomModel):
+# class Tmpuser(CustomModel):
 #     pid = models.BigIntegerField(primary_key=True)
 #     usuario = models.CharField(max_length=120, blank=True, null=True)
 #     usuario_pc = models.CharField(max_length=100, blank=True, null=True)
