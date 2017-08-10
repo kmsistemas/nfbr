@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 from nfbr.core.views import list_contribuinte, update_contribuinte, list_cfop, update_cfop, list_cst, update_cst, \
     list_entrada_nf, update_entrada_nf, list_produto, update_produto, home, create_cfop, create_contribuinte, \
-    create_cst, create_entrada_nf, create_produto
+    create_cst, create_entrada_nf, create_produto, list_uf, create_uf
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -31,6 +31,9 @@ urlpatterns = [
     url(r'^produto/$', list_produto, name='list_produto'),
     url(r'^produto/novo/$', create_produto, name='create_produto'),
     url(r'^produto/(?P<pk>\d+)/$', update_produto, name='update_produto'),
+
+    url(r'^uf/$', list_uf, name='list_uf'),
+    url(r'^uf/novo/$', create_uf, name='create_uf'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

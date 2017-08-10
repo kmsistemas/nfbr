@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load app_filters %}
+{% load l10n %}
 
 {% block content %}
     <div class="col-md-12">
@@ -17,7 +18,10 @@
 
                         {% if object_list.model.list_display_title %}
                         {% for field in object_list.model.list_display_title %}
-                            <th>{{ field.verbose_name|upper }}</th>
+                            <th class="{{ field|field_type }}">
+                                {{ field.verbose_name|upper }}
+                                {% comment %}{{ field|field_type }}{% endcomment %}
+                            </th>
                         {% endfor %}
                         {% else %}
                             <th>{{ object_list.model|verbose_name|upper }}</th>
@@ -30,13 +34,25 @@
                         <tr>
                             <th scope="row">{{ obj.pk }}</th>
 
+                            {% if object_list.model.list_display_title %}
+                                {% for field in object_list.model.list_display_title %}
+                                    <td class="{{ field|field_type }}">
+                                        {{ obj|get_attr:field.name|format_field|default_if_none:""|localize }}
+                                    </td>
+                                {% endfor %}
+                            {% else %}
+                                <td>{{ obj }}</td>
+                            {% endif %}
+
+                            {% comment %}
                             {% if obj.list_display_value %}
                             {% for value in obj.list_display_value %}
-                                <td>{{ value }}</td>
+                                <td>{{ value|localize }} | {{ value.name }}</td>
                             {% endfor %}
                             {% else %}
                                 <td>{{ obj }}</td>
                             {% endif %}
+                            {% endcomment %}
 
                             <td>
                                 <a href="{{ obj.get_edit_url }}" role="button" class="btn btn-warning btn-xs"

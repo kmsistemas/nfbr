@@ -64,6 +64,7 @@ DJANGO_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 )
 if DEVELOPER:
     DJANGO_APPS += (
@@ -145,6 +146,31 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'sqlhandler': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'sqlformatter'
+        }
+    },
+    'formatters': {
+        'sqlformatter': {
+            '()': 'sqlformatter.SqlFormatter',
+            'format': '%(levelname)s %(message)s',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['sqlhandler'],
+            'level': 'DEBUG',
+        },
+    }
+}
 
 
 # Internationalization

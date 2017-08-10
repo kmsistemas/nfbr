@@ -1,4 +1,5 @@
 {% load static from staticfiles %}
+{% load app_filters %}
 <!doctype html>
 <html lang="pt-br" class="perfect-scrollbar-off">
 <head>
@@ -54,37 +55,14 @@
                 </div>
 
                 <ul class="nav">
-	                <li class="{% if tbcontribuinte_list or form.instance.get_menu == 'tbcontribuinte' %}active{% endif %}">
-	                    <a href="{% url 'list_contribuinte' %}">
-	                        <i class="material-icons">dashboard</i>
-	                        <p>Contribuintes</p>
-	                    </a>
-	                </li>
-                    <li class="{% if tbcfop_list or form.instance.get_menu == 'tbcfop' %}active{% endif %}">
-	                    <a href="{% url 'list_cfop' %}">
-	                        <i class="material-icons">dashboard</i>
-	                        <p>Cfop</p>
-	                    </a>
-	                </li>
-                    <li class="{% if tbcst_list or form.instance.get_menu == 'tbcst' %}active{% endif %}">
-	                    <a href="{% url 'list_cst' %}">
-	                        <i class="material-icons">dashboard</i>
-	                        <p>Cst</p>
-	                    </a>
-	                </li>
-                    <li class="{% if tbentradanf_list or form.instance.get_menu == 'tbentradanf' %}active{% endif %}">
-	                    <a href="{% url 'list_entrada_nf' %}">
-	                        <i class="material-icons">dashboard</i>
-	                        <p>Entrada por Nota</p>
-	                    </a>
-	                </li>
-                    <li class="{% if tbproduto_list or form.instance.get_menu == 'tbproduto' %}active{% endif %}">
-	                    <a href="{% url 'list_produto' %}">
-	                        <i class="material-icons">dashboard</i>
-	                        <p>Produtos</p>
-	                    </a>
-	                </li>
-
+                    {% for menu in menu_items %}
+                        <li class="{% if object_list.model|model_name == menu.model_name or form.instance|model_name == menu.model_name %}active{% endif %}">
+                            <a href="{{ menu.link }}">
+                                <i class="material-icons">{{ menu.icon }}</i>
+                                <p>{{ menu.title|title }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
 	            </ul>
 	    	</div>
 		</div>
@@ -198,6 +176,6 @@
 
 	<!-- Material Dashboard DEMO methods, don't include it in your project!
 	<script src="{% static "assets/js/demo.js" %}"></script> -->
-
+    <script src="{% static "assets/js/custom.js" %}"></script>
 
 </html>

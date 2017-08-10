@@ -21,8 +21,8 @@ class CustomModel(models.Model):
     def list_display_title(self):
         return [(self._meta.get_field(field)) for field in self.list_display()]
 
-    def list_display_value(self):
-        return [(getattr(self, field)) for field in self.list_display()]
+    # def list_display_value(self):
+    #     return [(getattr(self, field)) for field in self.list_display()]
 
     class Meta:
         abstract = True
@@ -49,10 +49,6 @@ class Tbcfop(CustomModel):
 
     def get_edit_url(self):
         return r('update_cfop', self.pk)
-
-    @staticmethod
-    def get_menu():
-        return 'tbcfop'
 
     def list_display(self):
         return [
@@ -141,16 +137,84 @@ class Tbcontribuinte(CustomModel):
     def get_edit_url(self):
         return r('update_contribuinte', self.pk)
 
-    @staticmethod
-    def get_menu():
-        return 'tbcontribuinte'
-
     def list_display(self):
         return [
             'razao',
             'fantasia',
             'municipio',
         ]
+
+    @staticmethod
+    def tabs():
+        return (
+            {
+                'name': 'tab_dados', 'title': 'Dados',
+                'fields': (
+                    ({'name': 'razao', 'columns': 12},),
+                    ({'name': 'fantasia', 'columns': 12},),
+                    (
+                        {'name': 'cep', 'columns': 3},
+                        {'name': 'logradouro', 'columns': 4},
+                        {'name': 'nro_logradouro', 'columns': 2},
+                        {'name': 'complemento', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'bairro', 'columns': 3},
+                        {'name': 'municipio', 'columns': 4},
+                        {'name': 'ibge_municipio', 'columns': 2},
+                        {'name': 'id_uf', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'fone', 'columns': 3},
+                        {'name': 'fax', 'columns': 3},
+                        {'name': 'cnpj', 'columns': 3},
+                        {'name': 'ie', 'columns': 3},
+                    ),
+                    ({'name': 'email', 'columns': 12},),
+                    (
+                        {'name': 'validade_licenca', 'columns': 2},
+                        {'name': 'controla_financeiro', 'columns': 2},
+                        {'name': 'controla_estoque', 'columns': 2},
+                        {'name': 'orcamento', 'columns': 2},
+                        {'name': 'tipo_imp_orcamento', 'columns': 2},
+                        {'name': 'ambiente', 'columns': 2},
+                    ),
+                )
+            },
+            {
+                'name': 'tab_tributacao', 'title': 'Tributação',
+                'fields': (
+                    ({'name': 'regime_tributario', 'columns': 12},),
+                    ({'name': 'certificado', 'columns': 12},),
+                    (
+                        {'name': 'fuso_horario', 'columns': 3},
+                        {'name': 'numero_inicial_nfce', 'columns': 3},
+                        {'name': 'tipo_impressao_nfce', 'columns': 6},
+                    ),
+                    (
+                        {'name': 'id_token_nfce', 'columns': 2},
+                        {'name': 'codigo_token_nfce', 'columns': 10},
+                    ),
+                    (
+                        {'name': 'servidor_email_nfce', 'columns': 8},
+                        {'name': 'porta_email_nfce', 'columns': 4},
+                    ),
+                    (
+                        {'name': 'login_email_nfce', 'columns': 6},
+                        {'name': 'senha_email_nfce', 'columns': 6},
+                    ),
+                    (
+                        {'name': 'timeout_email_nfce', 'columns': 6},
+                        {'name': 'requer_autenticacao_email_nfce', 'columns': 6},
+                    ),
+                    ({'name': 'remetente_email_nfce', 'columns': 12},),
+                    ({'name': 'cc_email_nfce', 'columns': 12},),
+                    ({'name': 'cco_email_nfce', 'columns': 12},),
+                    ({'name': 'assunto_email_nfce', 'columns': 12},),
+                    ({'name': 'mensagem_email_nfce', 'columns': 12},),
+                )
+            },
+        )
 
 
 class Tbcst(CustomModel):
@@ -175,10 +239,6 @@ class Tbcst(CustomModel):
 
     def get_edit_url(self):
         return r('update_cst', self.pk)
-
-    @staticmethod
-    def get_menu():
-        return 'tbcst'
 
     def list_display(self):
         return [
@@ -209,10 +269,6 @@ class TbentradaNf(CustomModel):
 
     def get_edit_url(self):
         return r('update_entrada_nf', self.pk)
-
-    @staticmethod
-    def get_menu():
-        return 'tbentradanf'
 
     def list_display(self):
         return [
@@ -567,16 +623,24 @@ class Tbproduto(CustomModel):
     def get_edit_url(self):
         return r('update_produto', self.pk)
 
-    @staticmethod
-    def get_menu():
-        return 'tbproduto'
-
     def list_display(self):
         return [
             'codigo',
             'descricao',
             'saldo_estoque'
         ]
+
+    @staticmethod
+    def tabs():
+        return (
+            {
+                'name': 'tab_dados', 'title': 'Dados',
+                'fields': (
+                    ({'name': 'descricao', 'columns': 12},),
+                    ({'name': 'id_unidade_medida', 'columns': 12},),
+                )
+            },
+        )
 
 
 class TbtempProd(CustomModel):
@@ -665,7 +729,7 @@ class Tbtributacao(CustomModel):
 class Tbuf(CustomModel):
     id_uf = models.AutoField(primary_key=True)
     sigla = models.CharField(unique=True, max_length=2)
-    descricao = models.CharField(max_length=60)
+    descricao = models.CharField('descrição', max_length=60)
     ibge = models.CharField(unique=True, max_length=2)
 
     class Meta:

@@ -1,9 +1,8 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, TemplateView, CreateView
 
-from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm
-from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto
-
+from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm
+from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbuf
 
 home = TemplateView.as_view(template_name='index.html')
 
@@ -14,14 +13,14 @@ list_contribuinte = ListView.as_view(model=Tbcontribuinte,
 
 create_contribuinte = CreateView.as_view(model=Tbcontribuinte,
                                          form_class=TbcontribuinteForm,
-                                         # template_name='core/model_form.html'
+                                         template_name='core/model_form.html'
                                          )
 
 
 update_contribuinte = UpdateView.as_view(model=Tbcontribuinte,
                                          form_class=TbcontribuinteForm,
                                          success_url=reverse_lazy('list_contribuinte'),
-                                         # template_name='core/model_form.html'
+                                         template_name='core/model_form.html'
                                          )
 
 
@@ -83,3 +82,18 @@ update_produto = UpdateView.as_view(model=Tbproduto,
                                     form_class=TbprodutoForm,
                                     success_url=reverse_lazy('list_produto'),
                                     template_name='core/model_form.html')
+
+
+list_uf = ListView.as_view(model=Tbuf,
+                           template_name='core/model_list.html')
+
+
+create_uf = CreateView.as_view(model=Tbuf,
+                               form_class=TbufForm,
+                               template_name='core/model_form.html')
+
+
+update_uf = UpdateView.as_view(model=Tbuf,
+                               form_class=TbufForm,
+                               success_url=reverse_lazy('list_uf'),
+                               template_name='core/model_form.html')

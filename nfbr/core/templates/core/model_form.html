@@ -14,17 +14,44 @@
                 <div class="card-content">
                     {{ form.non_field_errors }}
 
-                    {% with col12='col-md-12' col10='col-md-10' col8='col-md-8' col6='col-md-6' col4='col-md-4' col3='col-md-3' col2='col-md-2' %}
+                    {% for tab in form.instance.tabs %}
+                        {% if forloop.first %}
+                            <ul class="nav nav-pills nav-pills-info">
+                        {% endif %}
 
-                        {% block model_form_field %}
+                        <li class="{% if forloop.first %}active{% endif %}">
+                            <a href="#{{ tab.name }}" data-toggle="tab">{{ tab.title }}</a>
+                        </li>
+
+                        {% if forloop.last %}
+                            </ul>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="tab-content">
+
+                        {% for tab in form.instance.tabs %}
+                            <div class="tab-pane {% if forloop.first %}active{% endif %}" id="{{ tab.name }}">
+                                {% for string_field_line in tab.fields %}
+
+                                    {% include 'row_begin.html' %}
+                                    {% for string_field in string_field_line %}
+                                        {% include 'core/model_form_field.html' with field=form|getfield:string_field.name class_column=string_field.columns %}
+                                    {% endfor %}
+                                    {% include 'row_end.html' %}
+
+                                {% endfor %}
+                            </div>
+                        {% empty %}
                             {% include 'row_begin.html' %}
                             {% for field in form %}
                                 {% include 'core/model_form_field.html' %}
                             {% endfor %}
                             {% include 'row_end.html' %}
-                        {% endblock model_form_field %}
+                        {% endfor %}
 
-                    {% endwith %}
+                    </div>
+
                 </div>
 
                 <div class="card-footer text-center">

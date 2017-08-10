@@ -25,3 +25,11 @@
 /*.form-group-km {*/
     /*padding-bottom: 1px !important;*/
 /*}*/
+
+
+/* Campos da grid */
+
+th.DecimalField,
+td.DecimalField {
+    text-align: right;
+}
