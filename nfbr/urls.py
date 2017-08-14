@@ -5,12 +5,17 @@ from django.conf.urls.static import static
 
 from nfbr.core.views import list_contribuinte, update_contribuinte, list_cfop, update_cfop, list_cst, update_cst, \
     list_entrada_nf, update_entrada_nf, list_produto, update_produto, home, create_cfop, create_contribuinte, \
-    create_cst, create_entrada_nf, create_produto, list_uf, create_uf
+    create_cst, create_entrada_nf, create_produto, list_uf, create_uf, changelist_contribuinte, \
+    changelist_contribuinte_post
 
 urlpatterns = [
+    url('^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
 
     url(r'^$', home, name='home'),
+
+    url(r'^alterar_contribuinte/$', changelist_contribuinte, name='changelist_contribuinte'),
+    url(r'^alterar_contribuinte_post/$', changelist_contribuinte_post, name='changelist_contribuinte_post'),
 
     url(r'^contribuinte/$', list_contribuinte, name='list_contribuinte'),
     url(r'^contribuinte/novo/$', create_contribuinte, name='create_contribuinte'),

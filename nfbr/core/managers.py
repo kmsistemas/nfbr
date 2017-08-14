@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -51,3 +52,16 @@ class TbusuarioManager(BaseUserManager):
         # user.is_admin = True
         # user.save(using=self._db)
         # return user
+
+
+class TbcontribuinteManager(models.Manager):
+    def all(self, user):
+        if user.is_superuser:
+            return super().all()
+        return super().get_queryset().filter(tbusuariocontribuinte__id_usuario=user)
+
+
+class ModelPerUserManager(models.Manager):
+    def all(self, user):
+        return super().get_queryset().filter(id_contribuinte__tbusuariocontribuinte__id_usuario=user,
+                                             id_contribuinte=user.id_contribuinte)

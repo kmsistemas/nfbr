@@ -1,3 +1,6 @@
+import hashlib
+import urllib.parse
+
 from django import template
 from django.template.defaultfilters import floatformat
 register = template.Library()
@@ -57,3 +60,12 @@ def format_field(value):
     if field_type(value) == 'Decimal':
         return floatformat(value, 2)
     return value
+
+
+# return only the URL of the gravatar
+# TEMPLATE USE:  {{ email|gravatar_url:150 }}
+@register.filter
+def gravatar_url(email, size=40):
+    # default = "https://example.com/static/images/defaultavatar.jpg"
+    default = "mm"
+    return "https://www.gravatar.com/avatar/%s?%s" % (hashlib.md5(email.lower().encode('utf-8')).hexdigest(), urllib.parse.urlencode({'d':default, 's':str(size)}))

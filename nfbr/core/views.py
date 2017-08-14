@@ -1,99 +1,113 @@
+from django.conf.global_settings import AUTH_USER_MODEL
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, TemplateView, CreateView
 
 from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm
 from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbuf
 
-home = TemplateView.as_view(template_name='index.html')
+
+class TemplateViewCustom(LoginRequiredMixin, TemplateView):
+    class Meta:
+        abstract = True
 
 
-list_contribuinte = ListView.as_view(model=Tbcontribuinte,
-                                     template_name='core/model_list.html')
+class ListViewCustom(LoginRequiredMixin, ListView):
+    template_name = 'core/model_list.html'
+
+    def get_queryset(self):
+        if self.model._default_manager.name == 'objects':
+            return self.model._default_manager.all()
+        return self.model.objects_per_user.all(self.request.user)
+
+    class Meta:
+        abstract = True
 
 
-create_contribuinte = CreateView.as_view(model=Tbcontribuinte,
-                                         form_class=TbcontribuinteForm,
-                                         template_name='core/model_form.html'
-                                         )
+class CreateViewCustom(LoginRequiredMixin, CreateView):
+    template_name = 'core/model_form.html'
+
+    class Meta:
+        abstract = True
 
 
-update_contribuinte = UpdateView.as_view(model=Tbcontribuinte,
-                                         form_class=TbcontribuinteForm,
-                                         success_url=reverse_lazy('list_contribuinte'),
-                                         template_name='core/model_form.html'
-                                         )
+class UpdateViewCustom(LoginRequiredMixin, UpdateView):
+    template_name = 'core/model_form.html'
+
+    def get_queryset(self):
+        if self.model._default_manager.name == 'objects':
+            return self.model._default_manager.all()
+        return self.model.objects_per_user.all(self.request.user)
+
+    class Meta:
+        abstract = True
 
 
-list_cfop = ListView.as_view(model=Tbcfop,
-                             template_name='core/model_list.html')
+home = TemplateViewCustom.as_view(template_name='index.html')
+
+changelist_contribuinte = ListViewCustom.as_view(model=Tbcontribuinte,
+                                                 template_name='core/changelist_contribuinte.html')
 
 
-create_cfop = CreateView.as_view(model=Tbcfop,
-                                 form_class=TbcfopForm,
-                                 template_name='core/model_form.html')
+def changelist_contribuinte_post(request):
+    contribuinte = Tbcontribuinte.objects_per_user.get(pk=request.POST.get('pk'))
+    user = get_user_model().objects.get(pk=request.user.pk)
+    user.id_contribuinte = contribuinte
+    user.save()
+    return HttpResponseRedirect(reverse_lazy('home'))
 
+list_contribuinte = ListViewCustom.as_view(model=Tbcontribuinte)
 
-update_cfop = UpdateView.as_view(model=Tbcfop,
-                                 form_class=TbcfopForm,
-                                 success_url=reverse_lazy('list_cfop'),
-                                 template_name='core/model_form.html')
+create_contribuinte = CreateViewCustom.as_view(model=Tbcontribuinte,
+                                               form_class=TbcontribuinteForm)
 
+update_contribuinte = UpdateViewCustom.as_view(model=Tbcontribuinte,
+                                               form_class=TbcontribuinteForm,
+                                               success_url=reverse_lazy('list_contribuinte'))
 
-list_cst = ListView.as_view(model=Tbcst,
-                            template_name='core/model_list.html')
+list_cfop = ListViewCustom.as_view(model=Tbcfop)
 
+create_cfop = CreateViewCustom.as_view(model=Tbcfop,
+                                       form_class=TbcfopForm)
 
-create_cst = CreateView.as_view(model=Tbcst,
-                                form_class=TbcstForm,
-                                template_name='core/model_form.html')
+update_cfop = UpdateViewCustom.as_view(model=Tbcfop,
+                                       form_class=TbcfopForm,
+                                       success_url=reverse_lazy('list_cfop'))
 
+list_cst = ListViewCustom.as_view(model=Tbcst)
 
-update_cst = UpdateView.as_view(model=Tbcst,
-                                form_class=TbcstForm,
-                                success_url=reverse_lazy('list_cst'),
-                                template_name='core/model_form.html')
+create_cst = CreateViewCustom.as_view(model=Tbcst,
+                                      form_class=TbcstForm)
 
+update_cst = UpdateViewCustom.as_view(model=Tbcst,
+                                      form_class=TbcstForm,
+                                      success_url=reverse_lazy('list_cst'))
 
-list_entrada_nf = ListView.as_view(model=TbentradaNf,
-                                   template_name='core/model_list.html')
+list_entrada_nf = ListViewCustom.as_view(model=TbentradaNf)
 
+create_entrada_nf = CreateViewCustom.as_view(model=TbentradaNf,
+                                             form_class=TbentradaNfForm)
 
-create_entrada_nf = CreateView.as_view(model=TbentradaNf,
-                                       form_class=TbentradaNfForm,
-                                       template_name='core/model_form.html')
+update_entrada_nf = UpdateViewCustom.as_view(model=TbentradaNf,
+                                             form_class=TbentradaNfForm,
+                                             success_url=reverse_lazy('list_entrada_nf'))
 
+list_produto = ListViewCustom.as_view(model=Tbproduto)
 
-update_entrada_nf = UpdateView.as_view(model=TbentradaNf,
-                                       form_class=TbentradaNfForm,
-                                       success_url=reverse_lazy('list_entrada_nf'),
-                                       template_name='core/model_form.html')
+create_produto = CreateViewCustom.as_view(model=Tbproduto,
+                                          form_class=TbprodutoForm)
 
+update_produto = UpdateViewCustom.as_view(model=Tbproduto,
+                                          form_class=TbprodutoForm,
+                                          success_url=reverse_lazy('list_produto'))
 
-list_produto = ListView.as_view(model=Tbproduto,
-                                template_name='core/model_list.html')
+list_uf = ListViewCustom.as_view(model=Tbuf)
 
+create_uf = CreateViewCustom.as_view(model=Tbuf,
+                                     form_class=TbufForm)
 
-create_produto = CreateView.as_view(model=Tbproduto,
-                                    form_class=TbprodutoForm,
-                                    template_name='core/model_form.html')
-
-
-update_produto = UpdateView.as_view(model=Tbproduto,
-                                    form_class=TbprodutoForm,
-                                    success_url=reverse_lazy('list_produto'),
-                                    template_name='core/model_form.html')
-
-
-list_uf = ListView.as_view(model=Tbuf,
-                           template_name='core/model_list.html')
-
-
-create_uf = CreateView.as_view(model=Tbuf,
-                               form_class=TbufForm,
-                               template_name='core/model_form.html')
-
-
-update_uf = UpdateView.as_view(model=Tbuf,
-                               form_class=TbufForm,
-                               success_url=reverse_lazy('list_uf'),
-                               template_name='core/model_form.html')
+update_uf = UpdateViewCustom.as_view(model=Tbuf,
+                                     form_class=TbufForm,
+                                     success_url=reverse_lazy('list_uf'))

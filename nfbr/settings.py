@@ -41,6 +41,8 @@ ADMINS = [('Alessandro', 'alessandro@kmsistemas.com.br'),]
 
 AUTH_USER_MODEL = 'core.Tbusuario'
 
+LOGIN_URL = '/login/'
+
 # SITE_ID = 1
 
 

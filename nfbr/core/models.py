@@ -5,8 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import resolve_url as r
 
-from nfbr.core.managers import TbusuarioManager
-
+from nfbr.core.managers import TbusuarioManager, TbcontribuinteManager, ModelPerUserManager
 
 SIM_NAO_CHOICES = (
     ('S', 'Sim'),
@@ -120,6 +119,8 @@ class Tbcontribuinte(CustomModel):
         ('2', 'Cupom'),
     )
     tipo_imp_orcamento = models.CharField('tipo orçamento', max_length=1, blank=True, null=True, choices=TIPO_IMPRESSAO_ORCAMENTO_CHOICES)
+
+    objects_per_user = TbcontribuinteManager()
 
     class Meta:
         managed = False
@@ -253,6 +254,8 @@ class TbentradaNf(CustomModel):
     id_pessoa = models.ForeignKey('Tbpessoa', models.DO_NOTHING, db_column='id_pessoa')
     valor_nf = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
+
+    objects_per_user = ModelPerUserManager()
 
     class Meta:
         managed = False
@@ -606,6 +609,8 @@ class Tbproduto(CustomModel):
     codif_la04 = models.CharField(max_length=21, blank=True, null=True)
     cest_i05c = models.CharField(max_length=7, blank=True, null=True)
 
+    objects_per_user = ModelPerUserManager()
+
     class Meta:
         managed = False
         db_table = 'tbproduto'
@@ -777,12 +782,21 @@ class Tbusuario(AbstractBaseUser, PermissionsMixin, CustomModel):
     senha = models.CharField(max_length=120)
     usuario_contabil = models.CharField(max_length=1)
     usuario_suporte_sistema = models.CharField(max_length=1)
-
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
         help_text=_('Designates whether the user can log into this admin site.'),
     )
+    id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte', blank=True,
+                                        null=True)
 
     objects = TbusuarioManager()
 
