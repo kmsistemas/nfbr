@@ -1,0 +1,1 @@
+$('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
