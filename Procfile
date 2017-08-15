@@ -1,0 +1,1 @@
+web: gunicorn nfbr.wsgi --log-file - --log-level warning
