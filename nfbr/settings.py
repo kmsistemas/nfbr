@@ -150,29 +150,30 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'sqlhandler': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'sqlformatter'
+if DEVELOPER:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'sqlhandler': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+                'formatter': 'sqlformatter'
+            }
+        },
+        'formatters': {
+            'sqlformatter': {
+                '()': 'sqlformatter.SqlFormatter',
+                'format': '%(levelname)s %(message)s',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'handlers': ['sqlhandler'],
+                'level': 'DEBUG',
+            },
         }
-    },
-    'formatters': {
-        'sqlformatter': {
-            '()': 'sqlformatter.SqlFormatter',
-            'format': '%(levelname)s %(message)s',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'handlers': ['sqlhandler'],
-            'level': 'DEBUG',
-        },
     }
-}
 
 
 # Internationalization
