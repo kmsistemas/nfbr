@@ -1,1 +1,25 @@
 {% extends 'base.html' %}
+
+{% block content %}
+    {% if notas %}
+    <h1>Notas Rejeitadas</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>CHAVE</th>
+                <th>SITUAÇÃO</th>
+                <th>NÚMERO</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for nota in notas %}
+            <tr>
+                <td>{{ nota.chave }}</td>
+                <td>{{ nota.situacao }}</td>
+                <td>{{ nota.numero }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endblock content %}

@@ -423,6 +423,13 @@ class Tbncm(CustomModel):
     def __str__(self):
         return self.codigo
 
+    @staticmethod
+    def get_add_url():
+        return r('create_ncm')
+
+    def get_edit_url(self):
+        return r('update_ncm', self.pk)
+
     def list_display(self):
         return [
             'codigo',
@@ -746,6 +753,13 @@ class Tbuf(CustomModel):
     def __str__(self):
         return self.sigla
 
+    @staticmethod
+    def get_add_url():
+        return r('create_uf')
+
+    def get_edit_url(self):
+        return r('update_uf', self.pk)
+
     def list_display(self):
         return [
             'sigla',
@@ -767,6 +781,16 @@ class TbunidadeMedida(CustomModel):
 
     def __str__(self):
         return self.descricao
+
+    @staticmethod
+    def get_add_url():
+        return r('create_unidade_medida')
+
+    def get_edit_url(self):
+        return r('update_unidade_medida', self.pk)
+
+    def get_delete_url(self):
+        return r('delete_unidade_medida', self.pk)
 
     def list_display(self):
         return [

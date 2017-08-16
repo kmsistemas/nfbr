@@ -60,11 +60,23 @@
 
                 <ul class="nav">
                     {% for menu in menu_items %}
-                        <li class="{% if object_list.model|model_name == menu.model_name or form.instance|model_name == menu.model_name %}active{% endif %}">
-                            <a href="{{ menu.link }}">
+                        <li class="{{ menu.model_name }} {% if request.get_full_path == menu.link %}active{% endif %}">
+                            <a {% if menu.submenus %}data-toggle="collapse" class="collapsed" aria-expanded="false"{% endif %} href="{{ menu.link }}">
                                 <i class="material-icons">{{ menu.icon }}</i>
-                                <p>{{ menu.title|title }}</p>
+                                <p>{{ menu.title|title }}{% if menu.submenus %}<b class="caret"></b>{% endif %}</p>
                             </a>
+
+                            {% if menu.submenus %}
+                                <div class="collapse" id="{{ menu.model_name }}" aria-expanded="false" style="height: 0px;">
+                                    <ul class="nav">
+                                        {% for submenu in menu.submenus %}
+                                        <li class="{{ submenu.model_name }}">
+                                            <a href="{{ submenu.link }}">{{ submenu.title|title }}</a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
                         </li>
                     {% endfor %}
 	            </ul>
@@ -72,7 +84,7 @@
 		</div>
         {% endif %}
 
-	    <div class="{% if user.is_authenticated %}main-panel{% else %}full-page login-page{% endif %}" filter-color="green">
+	    <div class="{% if user.is_authenticated %}main-panel{% else %}full-page login-page{% endif %}" filter-color="black" data-image="#">
 			{% if user.is_authenticated %}
             <nav class="navbar navbar-success navbar-absolute">
 				<div class="container-fluid">
@@ -173,6 +185,9 @@
 	                </p>
 	            </div>
 	        </footer>
+
+            <div class="full-page-background" style="background-image: url({% static 'assets/img/login.jpeg' %});"></div>
+
 	    </div>
 	</div>
 
@@ -199,5 +214,13 @@
 	<!-- Material Dashboard DEMO methods, don't include it in your project!
 	<script src="{% static "assets/js/demo.js" %}"></script> -->
     <script src="{% static "assets/js/custom.js" %}"></script>
+
+    <script type="text/javascript">
+        $("li.{{ object_list.model|model_name }}").addClass('active');
+        $("li.{{ form.instance|model_name }}").addClass('active');
+
+        $("li.{{ object_list.model|model_name }}").parents(".collapse").collapse();
+        $("li.{{ form.instance|model_name }}").parents(".collapse").collapse();
+    </script>
 
 </html>

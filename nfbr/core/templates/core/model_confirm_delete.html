@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load app_filters %}
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="card">
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                <div class="card-header " data-background-color="red">
+                    <h4 class="card-title">Confirmar Exclusão de {{ object|verbose_name|title }}</h4>
+                </div>
+
+                <div class="card-content">
+                    <p>Tem certeza de que deseja excluir "<strong>{{ object }}</strong>"?</p>
+                </div>
+
+                <div class="card-footer text-center">
+                    <div class="col-md-12">
+                        <input type="submit" class="btn btn-danger btn-fill" value="Confirmar" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from nfbr.core.models import Tbusuario, Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbncm, Tbuf
+from nfbr.core.models import Tbusuario, Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbncm, Tbuf, \
+    TbunidadeMedida
 
 
 class UserCreationForm(forms.ModelForm):
@@ -53,6 +54,18 @@ class TbcontribuinteForm(forms.ModelForm):
 
     class Meta:
         model = Tbcontribuinte
+        fields = '__all__'
+
+
+class TbunidadeMedidaForm(forms.ModelForm):
+    class Meta:
+        model = TbunidadeMedida
+        fields = '__all__'
+
+
+class TbncmForm(forms.ModelForm):
+    class Meta:
+        model = Tbncm
         fields = '__all__'
 
 
