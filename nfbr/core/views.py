@@ -21,6 +21,7 @@ class TemplateViewCustom(LoginRequiredMixin, TemplateView):
 
 class ListViewCustom(LoginRequiredMixin, ListView):
     template_name = 'core/model_list.html'
+    paginate_by = 15
 
     def get_queryset(self):
         if self.model._default_manager.name == 'objects':
@@ -121,6 +122,9 @@ update_uf = UpdateViewCustom.as_view(model=Tbuf,
                                      form_class=TbufForm,
                                      success_url=reverse_lazy('list_uf'))
 
+delete_uf = DeleteViewCustom.as_view(model=Tbuf,
+                                     success_url=reverse_lazy('list_uf'))
+
 # CST
 
 list_cst = ListViewCustom.as_view(model=Tbcst)
@@ -131,6 +135,9 @@ create_cst = CreateViewCustom.as_view(model=Tbcst,
 
 update_cst = UpdateViewCustom.as_view(model=Tbcst,
                                       form_class=TbcstForm,
+                                      success_url=reverse_lazy('list_cst'))
+
+delete_cst = DeleteViewCustom.as_view(model=Tbcst,
                                       success_url=reverse_lazy('list_cst'))
 
 # NCM
@@ -145,6 +152,9 @@ update_ncm = UpdateViewCustom.as_view(model=Tbncm,
                                       form_class=TbncmForm,
                                       success_url=reverse_lazy('list_ncm'))
 
+delete_ncm = DeleteViewCustom.as_view(model=Tbncm,
+                                      success_url=reverse_lazy('list_ncm'))
+
 # CFOP
 
 list_cfop = ListViewCustom.as_view(model=Tbcfop)
@@ -155,6 +165,9 @@ create_cfop = CreateViewCustom.as_view(model=Tbcfop,
 
 update_cfop = UpdateViewCustom.as_view(model=Tbcfop,
                                        form_class=TbcfopForm,
+                                       success_url=reverse_lazy('list_cfop'))
+
+delete_cfop = DeleteViewCustom.as_view(model=Tbcfop,
                                        success_url=reverse_lazy('list_cfop'))
 
 
@@ -180,5 +193,3 @@ create_produto = CreateViewCustom.as_view(model=Tbproduto,
 update_produto = UpdateViewCustom.as_view(model=Tbproduto,
                                           form_class=TbprodutoForm,
                                           success_url=reverse_lazy('list_produto'))
-
-

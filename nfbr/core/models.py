@@ -49,6 +49,9 @@ class Tbcfop(CustomModel):
     def get_edit_url(self):
         return r('update_cfop', self.pk)
 
+    def get_delete_url(self):
+        return r('delete_cfop', self.pk)
+
     def list_display(self):
         return [
             'codigo',
@@ -241,6 +244,9 @@ class Tbcst(CustomModel):
     def get_edit_url(self):
         return r('update_cst', self.pk)
 
+    def get_delete_url(self):
+        return r('delete_cst', self.pk)
+
     def list_display(self):
         return [
             'codigo',
@@ -429,6 +435,9 @@ class Tbncm(CustomModel):
 
     def get_edit_url(self):
         return r('update_ncm', self.pk)
+
+    def get_delete_url(self):
+        return r('delete_ncm', self.pk)
 
     def list_display(self):
         return [
@@ -759,6 +768,9 @@ class Tbuf(CustomModel):
 
     def get_edit_url(self):
         return r('update_uf', self.pk)
+
+    def get_delete_url(self):
+        return r('delete_uf', self.pk)
 
     def list_display(self):
         return [
