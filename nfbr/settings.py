@@ -118,6 +118,7 @@ TEMPLATES = [
 
                 'nfbr.core.context_processors.context_processor',
             ],
+            'debug': DEBUG,
         },
     },
 ]
