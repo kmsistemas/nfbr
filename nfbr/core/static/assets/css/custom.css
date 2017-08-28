@@ -33,3 +33,7 @@ th.DecimalField,
 td.DecimalField {
     text-align: right;
 }
+
+.nav-tabs {
+  background: #4caf50 !important;
+}

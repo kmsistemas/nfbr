@@ -1,9 +1,18 @@
-from django.contrib.admin import site
-# from django.contrib.auth.models import Group
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext, ugettext_lazy as _
 from nfbr.core.forms import UserCreationForm, UserChangeForm
 from nfbr.core.models import Tbusuario
+
+
+# @admin.register(Tbncm)
+# class TbncmAdmin(admin.ModelAdmin):
+#     pass
+#
+#
+# @admin.register(Tbproduto)
+# class TbprodutoAdmin(admin.ModelAdmin):
+#     pass
 
 
 class UserAdmin(BaseUserAdmin):
@@ -34,10 +43,10 @@ class UserAdmin(BaseUserAdmin):
 
 
 # Now register the new UserAdmin...
-site.register(Tbusuario, UserAdmin)
+admin.site.register(Tbusuario, UserAdmin)
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 # admin.site.unregister(Group)
 
 from django.contrib.auth.models import Permission
-site.register(Permission)
+admin.site.register(Permission)

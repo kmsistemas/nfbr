@@ -28,6 +28,9 @@
     <!--     Fonts and icons     -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
+
+    {% block extra_css %}
+    {% endblock extra_css %}
 </head>
 
 <body>
@@ -222,5 +225,8 @@
         $("li.{{ object_list.model|model_name }}").parents(".collapse").collapse();
         $("li.{{ form.instance|model_name }}").parents(".collapse").collapse();
     </script>
+
+    {% block extra_js %}
+    {% endblock extra_js %}
 
 </html>

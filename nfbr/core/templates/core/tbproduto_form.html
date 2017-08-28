@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load app_filters %}
+
+{% block extra_css %}
+    {{ form.media.css }}
+{% endblock extra_css %}
+
+{% block content %}
+
+    {% comment %}
+    <a class="related-widget-wrapper-link add-related" id="add_id_id_ncm" href="/admin/core/tbncm/add/?_to_field=id_ncm&amp;_popup=1" title="Adicionar outro ncm"><img src="/static/admin/img/icon-addlink.svg" alt="Adicionar"></a>
+
+    <a
+        href="/add/{{ form.id_ncm }}"
+        class="add-another"
+        id="add_id_{{ field }}"
+        onclick="return showAddAnotherPopup(this);">
+        <img src="/media/img/admin/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
+    </a>
+    {% endcomment %}
+
+    {% comment %}
+    <br>
+
+    <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}
+    {% for name, value in widget.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %}/>
+
+    <a href="{{ related_url }}" class="related-lookup" id="lookup_id_{{ widget.name }}" title="{{ link_title }}"></a>
+    {% if link_label %}&nbsp;<strong>{% if link_url %}<a href="{{ link_url }}">{% endif %}{{ link_label }}{% if link_url %}</a>{% endif %}</strong>{% endif %}
+    {% endcomment %}
+
+
+    {{ form.as_table }}
+
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ form.media.js }}
+{% endblock extra_js %}

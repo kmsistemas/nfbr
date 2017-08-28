@@ -1,7 +1,12 @@
+from django.contrib import admin
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+
 from nfbr.core.models import Tbusuario, Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbncm, Tbuf, \
-    TbunidadeMedida
+    TbunidadeMedida, Tbpessoa
+
+
+admin.autodiscover()
 
 
 class UserCreationForm(forms.ModelForm):
@@ -87,14 +92,61 @@ class TbentradaNfForm(forms.ModelForm):
         fields = '__all__'
 
 
+class TbpessoaForm(forms.ModelForm):
+    class Meta:
+        model = Tbpessoa
+        exclude = ('id_contribuinte', )
+
+
 class TbprodutoForm(forms.ModelForm):
     # id_ncm = forms.ModelChoiceField(queryset=Tbncm.objects.all(),
     #                                 widget=forms.TextInput)
-    # id_ncm = forms.ModelMultipleChoiceField(queryset=Tbncm.objects.all())
+    # id_ncm = forms.CharField(
+    #     label='Type the name of a fruit (AutoCompleteWidget)',
+    #     widget=AutoCompleteWidget(TbncmLookup),
+    #     required=False,
+    # )
+    # db_field = Tbproduto._meta.get_field('id_ncm')
+    # id_ncm = forms.ModelChoiceField(
+    #     queryset=Tbncm.objects.all(),
+    #     widget=ForeignKeyRawIdWidget(db_field.rel, admin.site),
+    #     required=False
+    # )
+    # id_ncm = forms.ChoiceField(
+    #     widget=ModelSelect2Widget(
+    #         model=Tbncm,
+    #         search_fields=['codigo__icontains']
+    #     )
+    # )
 
     class Meta:
         model = Tbproduto
-        fields = '__all__'
+        exclude = ('id_contribuinte',)
+        # fields = ('codigo', 'id_ncm')
+        # widgets = {
+        #     'id_ncm': Select2Widget
+        # }
+
+    # class Media:
+    #     js = ('admin/js/admin/RelatedObjectLookups.js',)
+
+    def __init__(self, *args, **kwargs):
+        self.id_contribuinte = None
+        if 'request' in kwargs:
+            request = kwargs.pop('request')
+            self.id_contribuinte = request.user.id_contribuinte
+
+        super(TbprodutoForm, self).__init__(*args, **kwargs)
+
+        if self.id_contribuinte is None:
+            self.id_contribuinte = self.instance.id_contribuinte
+
+        if self.id_contribuinte.regime_tributario == '3':
+            self.fields['id_cst_icms'].queryset = Tbcst.objects.filter(tipo='N')
+        else:
+            self.fields['id_cst_icms'].queryset = Tbcst.objects.filter(tipo='S')
+        self.fields['id_cst_pis'].queryset = Tbcst.objects.filter(tipo='C')
+        self.fields['id_cst_cofins'].queryset = Tbcst.objects.filter(tipo='C')
 
 
 class TbufForm(forms.ModelForm):

@@ -1,19 +1,46 @@
 {% extends 'base.html' %}
 {% load app_filters %}
 
+{% block extra_css %}
+    {{ form.media.css }}
+{% endblock extra_css %}
+
 {% block content %}
+
     <div class="col-md-12">
         <div class="card">
             <form action="" method="post" class="form-horizontal">
                 {% csrf_token %}
 
-                <div class="card-header " data-background-color="green">
+                <div class="card-header" data-background-color="black">
                     <h4 class="card-title">{{ form.instance|verbose_name|title }}</h4>
+
+                        <div class="nav-tabs-navigation">
+                            <div class="nav-tabs-wrapper">
+
+                                {% for tab in form.instance.tabs %}
+                                    {% if forloop.first %}
+                                    <ul class="nav nav-tabs" data-tabs="tabs">
+                                    {% endif %}
+
+                                        <li class="{% if forloop.first %}active{% endif %}">
+                                            <a href="#{{ tab.name }}" data-toggle="tab">{{ tab.title }}</a>
+                                        </li>
+
+                                    {% if forloop.last %}
+                                    </ul>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
                 </div>
 
                 <div class="card-content">
                     {{ form.non_field_errors }}
 
+                    {% comment %}
                     {% for tab in form.instance.tabs %}
                         {% if forloop.first %}
                             <ul class="nav nav-pills nav-pills-info">
@@ -27,6 +54,7 @@
                             </ul>
                         {% endif %}
                     {% endfor %}
+                    {% endcomment %}
 
                     <div class="tab-content">
 
@@ -62,4 +90,9 @@
             </form>
         </div>
     </div>
+
 {% endblock %}
+
+{% block extra_js %}
+    {{ form.media.js }}
+{% endblock extra_js %}

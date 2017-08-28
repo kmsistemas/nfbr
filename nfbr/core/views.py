@@ -1,14 +1,15 @@
-# from django.conf.global_settings import AUTH_USER_MODEL
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, TemplateView, CreateView, DeleteView
+from rest_framework.viewsets import ModelViewSet
 
 from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm, \
-    TbunidadeMedidaForm, TbncmForm
-from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbuf, TbunidadeMedida, Tbncm
+    TbunidadeMedidaForm, TbncmForm, TbpessoaForm
+from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbuf, TbunidadeMedida, Tbncm, \
+    Tbpessoa
+from .serializers import *
 
 
 # from nfbr.core.services import consulta_notas
@@ -34,6 +35,22 @@ class ListViewCustom(LoginRequiredMixin, ListView):
 
 class CreateViewCustom(LoginRequiredMixin, CreateView):
     template_name = 'core/model_form.html'
+
+    class Meta:
+        abstract = True
+
+
+class CreateViewCustomPerUser(CreateViewCustom):
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.id_contribuinte = self.request.user.id_contribuinte
+        instance.save()
+        return super(CreateViewCustomPerUser, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        kw = super(CreateViewCustomPerUser, self).get_form_kwargs()
+        kw['request'] = self.request
+        return kw
 
     class Meta:
         abstract = True
@@ -93,6 +110,9 @@ update_contribuinte = UpdateViewCustom.as_view(model=Tbcontribuinte,
                                                form_class=TbcontribuinteForm,
                                                success_url=reverse_lazy('list_contribuinte'))
 
+delete_contribuinte = DeleteViewCustom.as_view(model=Tbcontribuinte,
+                                               success_url=reverse_lazy('list_contribuinte'))
+
 # Views Padrões
 
 # Unidade de Medida
@@ -110,6 +130,12 @@ update_unidade_medida = UpdateViewCustom.as_view(model=TbunidadeMedida,
 delete_unidade_medida = DeleteViewCustom.as_view(model=TbunidadeMedida,
                                                  success_url=reverse_lazy('list_unidade_medida'))
 
+
+class TbunidadeMedidaViewSet(ModelViewSet):
+    queryset = TbunidadeMedida.objects.all()
+    serializer_class = TbunidadeMedidaSerializer
+
+
 # UF
 
 list_uf = ListViewCustom.as_view(model=Tbuf)
@@ -124,6 +150,12 @@ update_uf = UpdateViewCustom.as_view(model=Tbuf,
 
 delete_uf = DeleteViewCustom.as_view(model=Tbuf,
                                      success_url=reverse_lazy('list_uf'))
+
+
+class TbufViewSet(ModelViewSet):
+    queryset = Tbuf.objects.all()
+    serializer_class = TbufSerializer
+
 
 # CST
 
@@ -140,6 +172,12 @@ update_cst = UpdateViewCustom.as_view(model=Tbcst,
 delete_cst = DeleteViewCustom.as_view(model=Tbcst,
                                       success_url=reverse_lazy('list_cst'))
 
+
+class TbcstViewSet(ModelViewSet):
+    queryset = Tbcst.objects.all()
+    serializer_class = TbcstSerializer
+
+
 # NCM
 
 list_ncm = ListViewCustom.as_view(model=Tbncm)
@@ -154,6 +192,12 @@ update_ncm = UpdateViewCustom.as_view(model=Tbncm,
 
 delete_ncm = DeleteViewCustom.as_view(model=Tbncm,
                                       success_url=reverse_lazy('list_ncm'))
+
+
+class TbncmViewSet(ModelViewSet):
+    queryset = Tbncm.objects.all()
+    serializer_class = TbncmSerializer
+
 
 # CFOP
 
@@ -171,8 +215,56 @@ delete_cfop = DeleteViewCustom.as_view(model=Tbcfop,
                                        success_url=reverse_lazy('list_cfop'))
 
 
+class TbcfopViewSet(ModelViewSet):
+    queryset = Tbcfop.objects.all()
+    serializer_class = TbcfopSerializer
 
 
+# Views Cadastros
+
+# Pessoa
+
+list_pessoa = ListViewCustom.as_view(model=Tbpessoa)
+
+create_pessoa = CreateViewCustomPerUser.as_view(model=Tbpessoa,
+                                                form_class=TbpessoaForm,
+                                                success_url=reverse_lazy('list_pessoa'))
+
+update_pessoa = UpdateViewCustom.as_view(model=Tbpessoa,
+                                         form_class=TbpessoaForm,
+                                         success_url=reverse_lazy('list_pessoa'))
+
+delete_pessoa = DeleteViewCustom.as_view(model=Tbpessoa,
+                                         success_url=reverse_lazy('list_pessoa'))
+
+# Produto
+
+list_produto = ListViewCustom.as_view(model=Tbproduto)
+
+create_produto = CreateViewCustomPerUser.as_view(model=Tbproduto,
+                                                 form_class=TbprodutoForm,
+                                                 success_url=reverse_lazy('list_produto'))
+
+
+update_produto = UpdateViewCustom.as_view(model=Tbproduto,
+                                          form_class=TbprodutoForm,
+                                          success_url=reverse_lazy('list_produto'))
+
+delete_produto = DeleteViewCustom.as_view(model=Tbproduto,
+                                          success_url=reverse_lazy('list_produto'))
+
+
+class TbprodutoViewSet(ModelViewSet):
+    serializer_class = TbprodutoSerializer
+
+    def get_queryset(self):
+        return Tbproduto.objects_per_user.all(self.request.user)
+        # return self.request.user.accounts.all()
+
+
+# Views Movimentos
+
+# Entrada de Nota
 
 list_entrada_nf = ListViewCustom.as_view(model=TbentradaNf)
 
@@ -184,12 +276,7 @@ update_entrada_nf = UpdateViewCustom.as_view(model=TbentradaNf,
                                              form_class=TbentradaNfForm,
                                              success_url=reverse_lazy('list_entrada_nf'))
 
-list_produto = ListViewCustom.as_view(model=Tbproduto)
+delete_entrada_nf = DeleteViewCustom.as_view(model=TbentradaNf,
+                                             success_url=reverse_lazy('list_entrada_nf'))
 
-create_produto = CreateViewCustom.as_view(model=Tbproduto,
-                                          form_class=TbprodutoForm,
-                                          success_url=reverse_lazy('list_produto'))
-
-update_produto = UpdateViewCustom.as_view(model=Tbproduto,
-                                          form_class=TbprodutoForm,
-                                          success_url=reverse_lazy('list_produto'))
+teste = TemplateViewCustom.as_view(template_name='index.html')

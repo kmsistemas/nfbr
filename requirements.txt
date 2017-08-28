@@ -11,3 +11,9 @@ django-debug-toolbar==1.8
 gunicorn==19.4.3
 psycopg2==2.7.3
 sqlformatter
+djangorestframework==3.6.4
+markdown==2.6.9
+django-filter==1.0.4
+
+#django_select2==5.11.1
+#django-selectable==1.0.0

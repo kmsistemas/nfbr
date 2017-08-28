@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.shortcuts import resolve_url as r
 # from django.apps import apps
-from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbuf, TbunidadeMedida, Tbncm
+from nfbr.core.models import Tbcontribuinte, Tbcfop, Tbcst, TbentradaNf, Tbproduto, Tbuf, TbunidadeMedida, Tbncm, \
+    Tbpessoa
 
 
 def context_processor(request):
@@ -62,6 +63,12 @@ def context_processor(request):
             'link': '#menu_cadastros',
             'model_name': 'menu_cadastros',
             'submenus': (
+                {
+                    'title': Tbpessoa._meta.verbose_name_plural,
+                    'icon': 'dashboard',
+                    'link': r('list_pessoa'),
+                    'model_name': Tbpessoa._meta.model_name,
+                },
                 {
                     'title': Tbproduto._meta.verbose_name_plural,
                     'icon': 'dashboard',

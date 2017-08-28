@@ -7,13 +7,19 @@ from django.shortcuts import resolve_url as r
 
 from nfbr.core.managers import TbusuarioManager, TbcontribuinteManager, ModelPerUserManager
 
+
 SIM_NAO_CHOICES = (
     ('S', 'Sim'),
     ('N', 'Não'),
 )
 
+ATIVO_INATIVO_CHOICES = (
+    ('A', 'Ativo'),
+    ('I', 'Inativo'),
+)
 
-class CustomModel(models.Model):
+
+class CustomModel(object):
     def list_display(self):
         return []
 
@@ -23,11 +29,11 @@ class CustomModel(models.Model):
     # def list_display_value(self):
     #     return [(getattr(self, field)) for field in self.list_display()]
 
-    class Meta:
-        abstract = True
+    # class Meta:
+    #     abstract = True
 
 
-class Tbcfop(CustomModel):
+class Tbcfop(CustomModel, models.Model):
     id_cfop = models.AutoField(primary_key=True)
     codigo = models.CharField(unique=True, max_length=4)
     descricao = models.CharField(max_length=120)
@@ -59,11 +65,11 @@ class Tbcfop(CustomModel):
         ]
 
 
-class Tbcontribuinte(CustomModel):
+class Tbcontribuinte(CustomModel, models.Model):
     id_contribuinte = models.AutoField(primary_key=True)
     razao = models.CharField('razão social', max_length=120)
     fantasia = models.CharField('nome fantasia', max_length=120, blank=True, null=True)
-    situacao = models.CharField(max_length=1)
+    situacao = models.CharField(max_length=1, choices=ATIVO_INATIVO_CHOICES)
     cep = models.CharField(max_length=10, blank=True, null=True)
     logradouro = models.CharField(max_length=60, blank=True, null=True)
     nro_logradouro = models.CharField(max_length=60, blank=True, null=True)
@@ -221,7 +227,7 @@ class Tbcontribuinte(CustomModel):
         )
 
 
-class Tbcst(CustomModel):
+class Tbcst(CustomModel, models.Model):
     id_cst = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=3)
     tipo = models.CharField(max_length=1)
@@ -235,7 +241,7 @@ class Tbcst(CustomModel):
         verbose_name_plural = 'csts'
 
     def __str__(self):
-        return self.codigo
+        return "{} - {}".format(self.codigo, self.descricao)
 
     @staticmethod
     def get_add_url():
@@ -254,11 +260,11 @@ class Tbcst(CustomModel):
         ]
 
 
-class TbentradaNf(CustomModel):
+class TbentradaNf(CustomModel, models.Model):
     id_entrada_nf = models.AutoField(primary_key=True)
     data_nf = models.DateField()
     id_pessoa = models.ForeignKey('Tbpessoa', models.DO_NOTHING, db_column='id_pessoa')
-    valor_nf = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    valor_nf = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
 
     objects_per_user = ModelPerUserManager()
@@ -279,6 +285,9 @@ class TbentradaNf(CustomModel):
     def get_edit_url(self):
         return r('update_entrada_nf', self.pk)
 
+    def get_delete_url(self):
+        return r('delete_entrada_nf', self.pk)
+
     def list_display(self):
         return [
             'data_nf',
@@ -286,19 +295,19 @@ class TbentradaNf(CustomModel):
         ]
 
 
-class TbentradaNfItem(CustomModel):
+class TbentradaNfItem(CustomModel, models.Model):
     id_entrada_nf_item = models.AutoField(primary_key=True)
     id_entrada_nf = models.ForeignKey(TbentradaNf, models.DO_NOTHING, db_column='id_entrada_nf')
     id_produto = models.ForeignKey('Tbproduto', models.DO_NOTHING, db_column='id_produto')
-    quantidade = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    preco = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    quantidade = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    preco = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'tbentrada_nf_item'
 
 
-# class Tberros(CustomModel):
+# class Tberros(CustomModel, models.Model):
 #     id_erro = models.AutoField(primary_key=True)
 #     mensagem = models.TextField(unique=True)
 #     traducao = models.TextField(blank=True, null=True)
@@ -312,10 +321,10 @@ class TbentradaNfItem(CustomModel):
 #         db_table = 'tberros'
 
 
-class TbitmodVenda(CustomModel):
+class TbitmodVenda(CustomModel, models.Model):
     id_itmod_venda = models.AutoField(primary_key=True)
-    quantidade = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    preco = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    quantidade = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    preco = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     calcula = models.CharField(max_length=1)
     id_produto = models.ForeignKey('Tbproduto', models.DO_NOTHING, db_column='id_produto')
     id_mod_venda = models.ForeignKey('TbmodVenda', models.DO_NOTHING, db_column='id_mod_venda')
@@ -325,12 +334,12 @@ class TbitmodVenda(CustomModel):
         db_table = 'tbitmod_venda'
 
 
-class Tbitnfe(CustomModel):
+class Tbitnfe(CustomModel, models.Model):
     id_itnfe = models.AutoField(primary_key=True)
-    qcom_i10 = models.DecimalField(max_digits=65535, decimal_places=65535)
-    vuncom_i10a = models.DecimalField(max_digits=65535, decimal_places=65535)
-    vprod_i11 = models.DecimalField(max_digits=65535, decimal_places=65535)
-    vtottrib_m02 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    qcom_i10 = models.DecimalField(max_digits=65535, decimal_places=64)
+    vuncom_i10a = models.DecimalField(max_digits=65535, decimal_places=64)
+    vprod_i11 = models.DecimalField(max_digits=65535, decimal_places=64)
+    vtottrib_m02 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     id_produto = models.ForeignKey('Tbproduto', models.DO_NOTHING, db_column='id_produto')
     id_nfe = models.ForeignKey('Tbnfe', models.DO_NOTHING, db_column='id_nfe')
     cprod_i02 = models.CharField(max_length=60)
@@ -342,33 +351,33 @@ class Tbitnfe(CustomModel):
     cst_n12 = models.CharField(max_length=3, blank=True, null=True)
     ucom_i09 = models.CharField(max_length=6, blank=True, null=True)
     modbc_n13 = models.IntegerField(blank=True, null=True)
-    vbc_n15 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    picms_n16 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vicms_n17 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    predbc_n14 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    vbc_n15 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    picms_n16 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vicms_n17 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    predbc_n14 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     cean_i03 = models.CharField(max_length=14, blank=True, null=True)
-    vbcstret_n26 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vicmsstret_n27 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vicmsdeson_n27a = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    vbcstret_n26 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vicmsstret_n27 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vicmsdeson_n27a = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     motdesicms_n28 = models.IntegerField(blank=True, null=True)
     cst_q06 = models.CharField(max_length=2, blank=True, null=True)
-    vbc_q07 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    ppis_q08 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vpis_q09 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    qbcprod_q10 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    valiqprod_q11 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    vbc_q07 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    ppis_q08 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vpis_q09 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    qbcprod_q10 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    valiqprod_q11 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     cst_s06 = models.CharField(max_length=2, blank=True, null=True)
-    vbc_s07 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    pcofins_s08 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vcofins_s11 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    qbcprod_s09 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    valiqprod_s10 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vfrete_i15 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vdesc_i17 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    vbc_s07 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    pcofins_s08 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vcofins_s11 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    qbcprod_s09 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    valiqprod_s10 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vfrete_i15 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vdesc_i17 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     cprodanp_la02 = models.CharField(max_length=9, blank=True, null=True)
-    pmixgn_la03 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    pmixgn_la03 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     codif_la04 = models.CharField(max_length=21, blank=True, null=True)
-    qtemp_la05 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    qtemp_la05 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     cest_i05c = models.CharField(max_length=7, blank=True, null=True)
 
     class Meta:
@@ -395,7 +404,7 @@ class Tbitnfe(CustomModel):
 #         db_table = 'tblog'
 
 
-class TbmodVenda(CustomModel):
+class TbmodVenda(CustomModel, models.Model):
     id_mod_venda = models.AutoField(primary_key=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     descricao = models.CharField(max_length=60, blank=True, null=True)
@@ -415,7 +424,7 @@ class TbmodVenda(CustomModel):
         ]
 
 
-class Tbncm(CustomModel):
+class Tbncm(CustomModel, models.Model):
     id_ncm = models.AutoField(primary_key=True)
     codigo = models.CharField(unique=True, max_length=8)
     descricao = models.TextField()
@@ -446,14 +455,14 @@ class Tbncm(CustomModel):
         ]
 
 
-class TbncmIbpt(CustomModel):
+class TbncmIbpt(CustomModel, models.Model):
     id_ncm_ibpt = models.AutoField(primary_key=True)
     codigo_ncm = models.CharField(max_length=8)
     id_uf = models.ForeignKey('Tbuf', models.DO_NOTHING, db_column='id_uf')
-    aliquota_fed_nacional = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    aliquota_fed_importada = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    aliquota_estadual = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    aliquota_municipal = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliquota_fed_nacional = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    aliquota_fed_importada = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    aliquota_estadual = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    aliquota_municipal = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     data_inicio = models.DateField(blank=True, null=True)
     data_fim = models.DateField(blank=True, null=True)
 
@@ -462,32 +471,32 @@ class TbncmIbpt(CustomModel):
         db_table = 'tbncm_ibpt'
 
 
-class Tbnfe(CustomModel):
+class Tbnfe(CustomModel, models.Model):
     id_nfe = models.AutoField(primary_key=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_pessoa = models.ForeignKey('Tbpessoa', models.DO_NOTHING, db_column='id_pessoa', blank=True, null=True)
     dhemi_b09 = models.DateTimeField(blank=True, null=True)
-    vbc_w03 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vicms_w04 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vbcst_w05 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vst_w06 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vprod_w07 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vicmsdeson_w04a = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vfrete_w08 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vseg_w09 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vdesc_w10 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vii_w11 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vipi_w12 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vpis_w13 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vcofins_w14 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    voutro_w15 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vnf_w16 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vtottrib_w16a = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vlr_dinheiro = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vlr_cheque = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vlr_cartao_cre = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vlr_cartao_deb = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    vlr_outros = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    vbc_w03 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vicms_w04 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vbcst_w05 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vst_w06 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vprod_w07 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vicmsdeson_w04a = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vfrete_w08 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vseg_w09 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vdesc_w10 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vii_w11 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vipi_w12 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vpis_w13 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vcofins_w14 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    voutro_w15 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vnf_w16 = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vtottrib_w16a = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vlr_dinheiro = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vlr_cheque = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vlr_cartao_cre = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vlr_cartao_deb = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    vlr_outros = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     serie_b07 = models.IntegerField(blank=True, null=True)
     nnf_b08 = models.IntegerField(blank=True, null=True)
     data_finalizacao = models.DateTimeField(blank=True, null=True)
@@ -541,7 +550,7 @@ class Tbnfe(CustomModel):
         ]
 
 
-class TbnfeInutilizada(CustomModel):
+class TbnfeInutilizada(CustomModel, models.Model):
     id_nfe_inutilizada = models.AutoField(primary_key=True)
     ano = models.IntegerField()
     modelo = models.IntegerField()
@@ -559,7 +568,7 @@ class TbnfeInutilizada(CustomModel):
         db_table = 'tbnfe_inutilizada'
 
 
-class Tbpessoa(CustomModel):
+class Tbpessoa(CustomModel, models.Model):
     id_pessoa = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=120, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
@@ -580,6 +589,8 @@ class Tbpessoa(CustomModel):
     fornecedor = models.BooleanField()
     observacao = models.TextField(blank=True, null=True)
 
+    objects_per_user = ModelPerUserManager()
+
     class Meta:
         managed = False
         db_table = 'tbpessoa'
@@ -587,20 +598,65 @@ class Tbpessoa(CustomModel):
         verbose_name_plural = 'pessoas'
 
     def __str__(self):
-        return self.nome
+        return str(self.nome)
+
+    @staticmethod
+    def get_add_url():
+        return r('create_pessoa')
+
+    def get_edit_url(self):
+        return r('update_pessoa', self.pk)
+
+    def get_delete_url(self):
+        return r('delete_pessoa', self.pk)
 
     def list_display(self):
         return [
             'nome',
         ]
 
+    @staticmethod
+    def tabs():
+        return (
+            {
+                'name': 'tab_dados', 'title': 'Dados',
+                'fields': (
+                    ({'name': 'nome', 'columns': 12},),
+                    (
+                        {'name': 'cep', 'columns': 3},
+                        {'name': 'logradouro', 'columns': 4},
+                        {'name': 'nro_logradouro', 'columns': 2},
+                        {'name': 'complemento', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'bairro', 'columns': 3},
+                        {'name': 'municipio', 'columns': 4},
+                        {'name': 'ibge_municipio', 'columns': 2},
+                        {'name': 'id_uf', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'fone', 'columns': 3},
+                        {'name': 'cpf', 'columns': 3},
+                        {'name': 'cnpj', 'columns': 3},
+                        {'name': 'ie', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'email', 'columns': 6},
+                        {'name': 'cliente', 'columns': 3},
+                        {'name': 'fornecedor', 'columns': 3},
+                    ),
+                    ({'name': 'observacao', 'columns': 12},),
+                )
+            },
+        )
 
-class Tbproduto(CustomModel):
+
+class Tbproduto(CustomModel, models.Model):
     id_produto = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=20)
     descricao = models.CharField('descrição', max_length=120)
-    situacao = models.CharField(max_length=1)
-    preco_venda = models.DecimalField(max_digits=65535, decimal_places=65535)
+    situacao = models.CharField(max_length=1, choices=ATIVO_INATIVO_CHOICES)
+    preco_venda = models.DecimalField(max_digits=65535, decimal_places=2)
     origem = models.IntegerField()
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_unidade_medida = models.ForeignKey('TbunidadeMedida', models.DO_NOTHING, db_column='id_unidade_medida')
@@ -608,22 +664,23 @@ class Tbproduto(CustomModel):
     id_tributacao = models.ForeignKey('Tbtributacao', models.DO_NOTHING, db_column='id_tributacao', blank=True,
                                       null=True)
     id_cst_icms = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_icms', related_name='produtosIcms')
-    aliq_icms = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliq_icms = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
     id_cst_pis = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_pis', related_name='produtosPis')
-    aliq_pis = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliq_pis = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
     id_cst_cofins = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_cofins',
                                       related_name='produtosCofins')
-    aliq_cofins = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliq_cofins = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
     id_cfop = models.ForeignKey(Tbcfop, models.DO_NOTHING, db_column='id_cfop', blank=True, null=True)
     cod_barra = models.CharField(max_length=14, blank=True, null=True)
     modbcicms = models.IntegerField(blank=True, null=True)
-    pcredbcicms = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    saldo_estoque = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    estoque_minimo = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    pcredbcicms = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
+    saldo_estoque = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
+    estoque_minimo = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
     cprodanp_la02 = models.CharField(max_length=9, blank=True, null=True)
-    pmixgn_la03 = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    pmixgn_la03 = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
     codif_la04 = models.CharField(max_length=21, blank=True, null=True)
     cest_i05c = models.CharField(max_length=7, blank=True, null=True)
+    preco_atacado = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
 
     objects_per_user = ModelPerUserManager()
 
@@ -644,6 +701,9 @@ class Tbproduto(CustomModel):
     def get_edit_url(self):
         return r('update_produto', self.pk)
 
+    def get_delete_url(self):
+        return r('delete_produto', self.pk)
+
     def list_display(self):
         return [
             'codigo',
@@ -657,18 +717,59 @@ class Tbproduto(CustomModel):
             {
                 'name': 'tab_dados', 'title': 'Dados',
                 'fields': (
+                    (
+                        {'name': 'codigo', 'columns': 9},
+                        {'name': 'situacao', 'columns': 3},
+                    ),
                     ({'name': 'descricao', 'columns': 12},),
+                    (
+                        {'name': 'preco_venda', 'columns': 4},
+                        {'name': 'preco_atacado', 'columns': 4},
+                    ),
                     ({'name': 'id_unidade_medida', 'columns': 12},),
+                    ({'name': 'id_ncm', 'columns': 12},),
+                    (
+                        {'name': 'cest_i05c', 'columns': 4},
+                        {'name': 'cod_barra', 'columns': 8},
+                    ),
+                    (
+                        {'name': 'cprodanp_la02', 'columns': 8},
+                        {'name': 'pmixgn_la03', 'columns': 4},
+                    ),
+                    ({'name': 'codif_la04', 'columns': 12}, ),
+                )
+            },
+            {
+                'name': 'tab_tributacao', 'title': 'Tributação',
+                'fields': (
+                    ({'name': 'origem', 'columns': 12},),
+                    (
+                        {'name': 'id_cst_icms', 'columns': 9},
+                        {'name': 'aliq_icms', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'modbcicms', 'columns': 9},
+                        {'name': 'pcredbcicms', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'id_cst_pis', 'columns': 9},
+                        {'name': 'aliq_pis', 'columns': 3},
+                    ),
+                    (
+                        {'name': 'id_cst_cofins', 'columns': 9},
+                        {'name': 'aliq_cofins', 'columns': 3},
+                    ),
+                    ({'name': 'id_cfop', 'columns': 12},),
                 )
             },
         )
 
 
-class TbtempProd(CustomModel):
+class TbtempProd(CustomModel, models.Model):
     id_contribuinte = models.BigIntegerField(blank=True, null=True)
     codigo = models.CharField(max_length=20, blank=True, null=True)
     produto = models.CharField(max_length=60, blank=True, null=True)
-    preco = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    preco = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     cfop = models.CharField(max_length=4, blank=True, null=True)
     codbarras = models.CharField(max_length=14, blank=True, null=True)
     ncm = models.CharField(max_length=8, blank=True, null=True)
@@ -678,19 +779,19 @@ class TbtempProd(CustomModel):
         db_table = 'tbtemp_prod'
 
 
-class Tbtitulo(CustomModel):
+class Tbtitulo(CustomModel, models.Model):
     id_titulo = models.AutoField(primary_key=True)
     tipo = models.CharField(max_length=1)
     codigo = models.CharField(max_length=120, blank=True, null=True)
     descricao = models.CharField(max_length=120)
     emissao = models.DateField()
     vencimento = models.DateField()
-    valor = models.DecimalField(max_digits=65535, decimal_places=65535)
+    valor = models.DecimalField(max_digits=65535, decimal_places=64)
     id_pessoa = models.ForeignKey(Tbpessoa, models.DO_NOTHING, db_column='id_pessoa')
     liquidacao = models.DateField(blank=True, null=True)
-    valor_pago = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    valor_desconto = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    valor_juro = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    valor_pago = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    valor_desconto = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
+    valor_juro = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_entrada_nf = models.ForeignKey(TbentradaNf, models.DO_NOTHING, db_column='id_entrada_nf', blank=True, null=True)
     id_nfe = models.ForeignKey(Tbnfe, models.DO_NOTHING, db_column='id_nfe', blank=True, null=True)
@@ -714,21 +815,21 @@ class Tbtitulo(CustomModel):
         ]
 
 
-class Tbtributacao(CustomModel):
+class Tbtributacao(CustomModel, models.Model):
     id_tributacao = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=20)
     descricao = models.CharField(max_length=120)
     id_cst_icms = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_icms', related_name='tributacoesIcms')
-    aliq_icms = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliq_icms = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     id_cst_pis = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_pis', related_name='tributacoesPis')
-    aliq_pis = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliq_pis = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     id_cst_cofins = models.ForeignKey(Tbcst, models.DO_NOTHING, db_column='id_cst_cofins',
                                       related_name='tributacoesCofins')
-    aliq_cofins = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    aliq_cofins = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
     id_cfop = models.ForeignKey(Tbcfop, models.DO_NOTHING, db_column='id_cfop')
     modbcicms = models.IntegerField(blank=True, null=True)
-    pcredbcicms = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    pcredbcicms = models.DecimalField(max_digits=65535, decimal_places=64, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -747,7 +848,7 @@ class Tbtributacao(CustomModel):
         ]
 
 
-class Tbuf(CustomModel):
+class Tbuf(CustomModel, models.Model):
     id_uf = models.AutoField(primary_key=True)
     sigla = models.CharField(unique=True, max_length=2)
     descricao = models.CharField('descrição', max_length=60)
@@ -780,7 +881,7 @@ class Tbuf(CustomModel):
         ]
 
 
-class TbunidadeMedida(CustomModel):
+class TbunidadeMedida(CustomModel, models.Model):
     id_unidade_medida = models.AutoField(primary_key=True)
     sigla = models.CharField(unique=True, max_length=6)
     descricao = models.CharField(unique=True, max_length=30)
@@ -811,7 +912,7 @@ class TbunidadeMedida(CustomModel):
         ]
 
 
-class Tbusuario(AbstractBaseUser, PermissionsMixin, CustomModel):
+class Tbusuario(AbstractBaseUser, PermissionsMixin):
     id_usuario = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=120, blank=True, null=True)
     email = models.CharField(unique=True, max_length=120)
@@ -850,7 +951,7 @@ class Tbusuario(AbstractBaseUser, PermissionsMixin, CustomModel):
         return self.nome
 
 
-class TbusuarioContribuinte(CustomModel):
+class TbusuarioContribuinte(CustomModel, models.Model):
     id_usuario = models.ForeignKey(Tbusuario, models.DO_NOTHING, db_column='id_usuario', primary_key=True)
     id_contribuinte = models.ForeignKey(Tbcontribuinte, models.DO_NOTHING, db_column='id_contribuinte')
 
@@ -860,7 +961,7 @@ class TbusuarioContribuinte(CustomModel):
         unique_together = (('id_usuario', 'id_contribuinte'),)
 
 
-# class Tbviewlog(CustomModel):
+# class Tbviewlog(CustomModel, models.Model):
 #     nome_tabela = models.CharField(primary_key=True, max_length=60)
 #     nome_campo = models.CharField(max_length=60)
 #     descricao_campo = models.CharField(max_length=60, blank=True, null=True)
@@ -872,7 +973,7 @@ class TbusuarioContribuinte(CustomModel):
 #         unique_together = (('nome_tabela', 'nome_campo'),)
 
 
-# class Tmpuser(CustomModel):
+# class Tmpuser(CustomModel, models.Model):
 #     pid = models.BigIntegerField(primary_key=True)
 #     usuario = models.CharField(max_length=120, blank=True, null=True)
 #     usuario_pc = models.CharField(max_length=100, blank=True, null=True)
