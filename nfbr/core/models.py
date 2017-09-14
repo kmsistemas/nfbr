@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+import hashlib
+import urllib.parse
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
@@ -6,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import resolve_url as r
 
 from nfbr.core.managers import TbusuarioManager, TbcontribuinteManager, ModelPerUserManager
-
 
 SIM_NAO_CHOICES = (
     ('S', 'Sim'),
@@ -26,11 +27,11 @@ class CustomModel(object):
     def list_display_title(self):
         return [(self._meta.get_field(field)) for field in self.list_display()]
 
-    # def list_display_value(self):
-    #     return [(getattr(self, field)) for field in self.list_display()]
+        # def list_display_value(self):
+        #     return [(getattr(self, field)) for field in self.list_display()]
 
-    # class Meta:
-    #     abstract = True
+        # class Meta:
+        #     abstract = True
 
 
 class Tbcfop(CustomModel, models.Model):
@@ -87,7 +88,8 @@ class Tbcontribuinte(CustomModel, models.Model):
         ('2', '2 - Simples Nacional (Excesso de sublimite de receita bruta)'),
         ('3', '3 - Regime Normal'),
     )
-    regime_tributario = models.CharField('regime tributário', max_length=1, blank=True, null=True, choices=REGIME_TRIBUTARIO_CHOICES)
+    regime_tributario = models.CharField('regime tributário', max_length=1, blank=True, null=True,
+                                         choices=REGIME_TRIBUTARIO_CHOICES)
     id_token_nfce = models.CharField('id. token', max_length=20, blank=True, null=True)
     codigo_token_nfce = models.CharField('código token', max_length=60, blank=True, null=True)
     servidor_email_nfce = models.CharField('servidor de envio de e-mail (SMTP)', max_length=100, blank=True, null=True)
@@ -127,7 +129,8 @@ class Tbcontribuinte(CustomModel, models.Model):
         ('1', 'A4'),
         ('2', 'Cupom'),
     )
-    tipo_imp_orcamento = models.CharField('tipo orçamento', max_length=1, blank=True, null=True, choices=TIPO_IMPRESSAO_ORCAMENTO_CHOICES)
+    tipo_imp_orcamento = models.CharField('tipo orçamento', max_length=1, blank=True, null=True,
+                                          choices=TIPO_IMPRESSAO_ORCAMENTO_CHOICES)
 
     objects_per_user = TbcontribuinteManager()
 
@@ -736,7 +739,7 @@ class Tbproduto(CustomModel, models.Model):
                         {'name': 'cprodanp_la02', 'columns': 8},
                         {'name': 'pmixgn_la03', 'columns': 4},
                     ),
-                    ({'name': 'codif_la04', 'columns': 12}, ),
+                    ({'name': 'codif_la04', 'columns': 12},),
                 )
             },
             {
@@ -950,6 +953,13 @@ class Tbusuario(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return self.nome
 
+    def get_avatar_url(self, size=40):
+        # default = "https://example.com/static/images/defaultavatar.jpg"
+        default = "mm"
+        return "https://www.gravatar.com/avatar/%s?%s" % (
+            hashlib.md5(self.email.lower().encode('utf-8')).hexdigest(),
+            urllib.parse.urlencode({'d': default, 's': str(size)}))
+
 
 class TbusuarioContribuinte(CustomModel, models.Model):
     id_usuario = models.ForeignKey(Tbusuario, models.DO_NOTHING, db_column='id_usuario', primary_key=True)
@@ -959,7 +969,6 @@ class TbusuarioContribuinte(CustomModel, models.Model):
         managed = False
         db_table = 'tbusuario_contribuinte'
         unique_together = (('id_usuario', 'id_contribuinte'),)
-
 
 # class Tbviewlog(CustomModel, models.Model):
 #     nome_tabela = models.CharField(primary_key=True, max_length=60)

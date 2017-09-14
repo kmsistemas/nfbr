@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.contrib.admin.views.decorators import staff_member_required
 from rest_framework import routers
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 from nfbr.core.views import *
 
@@ -27,6 +28,8 @@ router.register(cfop, TbcfopViewSet)
 router.register(produto, TbprodutoViewSet, produto)
 
 urlpatterns = [
+    url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^api-token-refresh/', refresh_jwt_token),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/', include(router.urls)),
 

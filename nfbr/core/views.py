@@ -3,6 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, TemplateView, CreateView, DeleteView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm, \
@@ -78,6 +80,9 @@ class DeleteViewCustom(LoginRequiredMixin, DeleteView):
 
     class Meta:
         abstract = True
+
+
+# Views Base
 
 
 class _HomeView(TemplateViewCustom):
@@ -258,6 +263,7 @@ class TbprodutoViewSet(ModelViewSet):
     serializer_class = TbprodutoSerializer
 
     def get_queryset(self):
+        print(self.request.user)
         return Tbproduto.objects_per_user.all(self.request.user)
         # return self.request.user.accounts.all()
 
