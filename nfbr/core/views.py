@@ -3,10 +3,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, TemplateView, CreateView, DeleteView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import filters
+from rest_framework import filters, permissions
 
 from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm, \
     TbunidadeMedidaForm, TbncmForm, TbpessoaForm
@@ -83,6 +84,14 @@ class DeleteViewCustom(LoginRequiredMixin, DeleteView):
         abstract = True
 
 
+class ModelViewSetBase:
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
+    filter_fields = '__all__'
+
+    class Meta:
+        abstract = True
+
+
 # Views Base
 
 
@@ -119,6 +128,29 @@ update_contribuinte = UpdateViewCustom.as_view(model=Tbcontribuinte,
 delete_contribuinte = DeleteViewCustom.as_view(model=Tbcontribuinte,
                                                success_url=reverse_lazy('list_contribuinte'))
 
+
+class TbcontribuinteViewSet(ModelViewSet, ModelViewSetBase):
+    serializer_class = TbcontribuinteSerializer
+    search_fields = ('razao', 'fantasia')
+
+    def get_queryset(self):
+        return Tbcontribuinte.objects_per_user.all(self.request.user)
+
+
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
+def api_contribuinte_post(request):
+    # print('--------')
+    # print(request.data.get('pk'))
+    # print(request.user)
+    contribuinte = Tbcontribuinte.objects_per_user.get(pk=request.data.get('pk'))
+    user = get_user_model().objects.get(pk=request.user.pk)
+    user.id_contribuinte = contribuinte
+    user.save()
+    # print(str(user.id_contribuinte))
+    return Response({'contribuinte': str(user.id_contribuinte)})
+
+
 # Views Padrões
 
 # Unidade de Medida
@@ -137,11 +169,9 @@ delete_unidade_medida = DeleteViewCustom.as_view(model=TbunidadeMedida,
                                                  success_url=reverse_lazy('list_unidade_medida'))
 
 
-class TbunidadeMedidaViewSet(ModelViewSet):
+class TbunidadeMedidaViewSet(ModelViewSet, ModelViewSetBase):
     queryset = TbunidadeMedida.objects.all()
     serializer_class = TbunidadeMedidaSerializer
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
-    filter_fields = '__all__'
     search_fields = ('sigla', 'descricao')
 
 
@@ -161,9 +191,10 @@ delete_uf = DeleteViewCustom.as_view(model=Tbuf,
                                      success_url=reverse_lazy('list_uf'))
 
 
-class TbufViewSet(ModelViewSet):
+class TbufViewSet(ModelViewSet, ModelViewSetBase):
     queryset = Tbuf.objects.all()
     serializer_class = TbufSerializer
+    search_fields = ('sigla', 'descricao')
 
 
 # CST
@@ -182,9 +213,10 @@ delete_cst = DeleteViewCustom.as_view(model=Tbcst,
                                       success_url=reverse_lazy('list_cst'))
 
 
-class TbcstViewSet(ModelViewSet):
+class TbcstViewSet(ModelViewSet, ModelViewSetBase):
     queryset = Tbcst.objects.all()
     serializer_class = TbcstSerializer
+    search_fields = ('codigo', 'descricao')
 
 
 # NCM
@@ -203,9 +235,10 @@ delete_ncm = DeleteViewCustom.as_view(model=Tbncm,
                                       success_url=reverse_lazy('list_ncm'))
 
 
-class TbncmViewSet(ModelViewSet):
+class TbncmViewSet(ModelViewSet, ModelViewSetBase):
     queryset = Tbncm.objects.all()
     serializer_class = TbncmSerializer
+    search_fields = ('codigo', 'descricao')
 
 
 # CFOP
@@ -224,9 +257,10 @@ delete_cfop = DeleteViewCustom.as_view(model=Tbcfop,
                                        success_url=reverse_lazy('list_cfop'))
 
 
-class TbcfopViewSet(ModelViewSet):
+class TbcfopViewSet(ModelViewSet, ModelViewSetBase):
     queryset = Tbcfop.objects.all()
     serializer_class = TbcfopSerializer
+    search_fields = ('codigo', 'descricao')
 
 
 # Views Cadastros
@@ -263,13 +297,12 @@ delete_produto = DeleteViewCustom.as_view(model=Tbproduto,
                                           success_url=reverse_lazy('list_produto'))
 
 
-class TbprodutoViewSet(ModelViewSet):
+class TbprodutoViewSet(ModelViewSet, ModelViewSetBase):
     serializer_class = TbprodutoSerializer
+    search_fields = ('codigo', 'descricao')
 
     def get_queryset(self):
-        print(self.request.user)
         return Tbproduto.objects_per_user.all(self.request.user)
-        # return self.request.user.accounts.all()
 
 
 # Views Movimentos

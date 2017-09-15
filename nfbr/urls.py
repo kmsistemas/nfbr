@@ -20,6 +20,7 @@ cfop = "cfop"
 produto = "produto"
 
 router = routers.DefaultRouter(trailing_slash=True)
+router.register(r'alterar_contribuinte', TbcontribuinteViewSet, base_name='alterar_contribuinte')
 router.register(unidade_medida, TbunidadeMedidaViewSet)
 router.register(uf, TbufViewSet)
 router.register(cst, TbcstViewSet)
@@ -32,6 +33,7 @@ urlpatterns = [
     url(r'^api-token-refresh/', refresh_jwt_token),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/', include(router.urls)),
+    url(r'^api/alterar_contribuinte_post/', api_contribuinte_post),
 
     # url(r'^select2/', include('django_select2.urls')),
     # url(r'^selectable/', include('selectable.urls')),

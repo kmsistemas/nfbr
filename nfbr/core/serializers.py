@@ -10,6 +10,13 @@ class TbusuarioSerializer(serializers.ModelSerializer):
         fields = ('email', 'contribuinte', 'get_avatar_url')
 
 
+class TbcontribuinteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tbcontribuinte
+        fields = '__all__'
+
+
 class TbunidadeMedidaSerializer(serializers.ModelSerializer):
 
     class Meta:

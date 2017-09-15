@@ -31,6 +31,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 DEVELOPER = config('DEVELOPER', default=False, cast=bool)
 
+LOG_SQL = config('LOG_SQL', default=False, cast=bool)
+
 MESSAGE_LEVEL = message_constants.DEBUG
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=Csv())
@@ -159,7 +161,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-if DEVELOPER:
+if LOG_SQL:
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
