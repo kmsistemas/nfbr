@@ -79,6 +79,7 @@ THIRD_PARTS_APPS = (
     'debug_toolbar',
     'rest_framework',
     'corsheaders',
+    'django_filters',
     # 'django_select2',
     # 'selectable',
 )
@@ -225,7 +226,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 5
+    'PAGE_SIZE': 5,
+    # 'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend', ),
+    # 'SEARCH_PARAM': 'q'
 }
 
 JWT_AUTH = {

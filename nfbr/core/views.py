@@ -6,6 +6,7 @@ from django.views.generic import ListView, UpdateView, TemplateView, CreateView,
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import filters
 
 from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm, \
     TbunidadeMedidaForm, TbncmForm, TbpessoaForm
@@ -139,6 +140,9 @@ delete_unidade_medida = DeleteViewCustom.as_view(model=TbunidadeMedida,
 class TbunidadeMedidaViewSet(ModelViewSet):
     queryset = TbunidadeMedida.objects.all()
     serializer_class = TbunidadeMedidaSerializer
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
+    filter_fields = '__all__'
+    search_fields = ('sigla', 'descricao')
 
 
 # UF

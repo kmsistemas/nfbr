@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext, ugettext_lazy as _
 from nfbr.core.forms import UserCreationForm, UserChangeForm
-from nfbr.core.models import Tbusuario
+from nfbr.core.models import Tbusuario, TbunidadeMedida
 
 
 # @admin.register(Tbncm)
@@ -40,6 +40,11 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'nome')
     ordering = ('email',)
     # filter_horizontal = ('groups', 'user_permissions',)
+
+
+@admin.register(TbunidadeMedida)
+class TbunidadeMedidaAdmin(admin.ModelAdmin):
+    search_fields = ('descricao', )
 
 
 # Now register the new UserAdmin...
