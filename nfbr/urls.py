@@ -25,6 +25,7 @@ router.register(unidade_medida, TbunidadeMedidaViewSet)
 router.register(uf, TbufViewSet)
 router.register(cst, TbcstViewSet)
 router.register(ncm, TbncmViewSet)
+router.register("lookups/" + ncm, TbncmLookupViewSet)
 router.register(cfop, TbcfopViewSet)
 router.register(produto, TbprodutoViewSet, produto)
 

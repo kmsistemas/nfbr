@@ -92,6 +92,14 @@ class ModelViewSetBase:
         abstract = True
 
 
+class ModelViewSetBaseTest(ModelViewSet):
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
+    filter_fields = '__all__'
+
+    class Meta:
+        abstract = True
+
+
 # Views Base
 
 
@@ -239,6 +247,12 @@ class TbncmViewSet(ModelViewSet, ModelViewSetBase):
     queryset = Tbncm.objects.all()
     serializer_class = TbncmSerializer
     search_fields = ('codigo', 'descricao')
+
+
+class TbncmLookupViewSet(ModelViewSetBaseTest):
+    queryset = Tbncm.objects.all()
+    serializer_class = TbncmLookupSerializer
+    search_fields = ('codigo',)
 
 
 # CFOP

@@ -45,6 +45,15 @@ class TbncmSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TbncmLookupSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(source='pk', read_only=True)
+    text = serializers.ReadOnlyField(source='__str__', read_only=True)
+
+    class Meta:
+        model = Tbncm
+        fields = ('id', 'text')
+
+
 class TbcfopSerializer(serializers.ModelSerializer):
 
     class Meta:
