@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import filters, permissions
+from rest_framework import filters, permissions, pagination
 
 from nfbr.core.forms import TbcontribuinteForm, TbcfopForm, TbcstForm, TbentradaNfForm, TbprodutoForm, TbufForm, \
     TbunidadeMedidaForm, TbncmForm, TbpessoaForm
@@ -92,9 +92,10 @@ class ModelViewSetBase:
         abstract = True
 
 
-class ModelViewSetBaseTest(ModelViewSet):
+class ModelViewSetBaseLookup(ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = '__all__'
+    pagination_class = pagination.PageNumberPagination
 
     class Meta:
         abstract = True
@@ -249,7 +250,7 @@ class TbncmViewSet(ModelViewSet, ModelViewSetBase):
     search_fields = ('codigo', 'descricao')
 
 
-class TbncmLookupViewSet(ModelViewSetBaseTest):
+class TbncmLookupViewSet(ModelViewSetBaseLookup):
     queryset = Tbncm.objects.all()
     serializer_class = TbncmLookupSerializer
     search_fields = ('codigo',)
