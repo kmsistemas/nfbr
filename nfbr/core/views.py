@@ -184,6 +184,12 @@ class TbunidadeMedidaViewSet(ModelViewSet, ModelViewSetBase):
     search_fields = ('sigla', 'descricao')
 
 
+class TbunidadeMedidaLookupViewSet(ModelViewSetBaseLookup):
+    queryset = TbunidadeMedida.objects.all()
+    serializer_class = TbunidadeMedidaLookupSerializer
+    search_fields = ('sigla', 'descricao')
+
+
 # UF
 
 list_uf = ListViewCustom.as_view(model=Tbuf)
@@ -226,6 +232,29 @@ class TbcstViewSet(ModelViewSet, ModelViewSetBase):
     queryset = Tbcst.objects.all()
     serializer_class = TbcstSerializer
     search_fields = ('codigo', 'descricao')
+
+
+class TbcstLookupViewSet(ModelViewSetBaseLookup):
+    # queryset = Tbcst.objects.all()
+    serializer_class = TbcstLookupSerializer
+    search_fields = ('codigo',)
+
+    def get_queryset(self):
+        queryset = Tbcst.objects.all()
+        icms = self.request.query_params.get('icms', None)
+        if icms is not None:
+            user = self.request.user
+            if user.id_contribuinte.regime_tributario == '3':
+                queryset = queryset.filter(tipo='N')
+            else:
+                queryset = queryset.filter(tipo='S')
+
+        pis = self.request.query_params.get('pis', None)
+        cofins = self.request.query_params.get('cofins', None)
+        if pis or cofins is not None:
+            queryset = queryset.filter(tipo='C')
+
+        return queryset
 
 
 # NCM
@@ -278,6 +307,12 @@ class TbcfopViewSet(ModelViewSet, ModelViewSetBase):
     search_fields = ('codigo', 'descricao')
 
 
+class TbcfopLookupViewSet(ModelViewSetBaseLookup):
+    queryset = Tbcfop.objects.all()
+    serializer_class = TbcfopLookupSerializer
+    search_fields = ('codigo',)
+
+
 # Views Cadastros
 
 # Pessoa
@@ -312,12 +347,22 @@ delete_produto = DeleteViewCustom.as_view(model=Tbproduto,
                                           success_url=reverse_lazy('list_produto'))
 
 
-class TbprodutoViewSet(ModelViewSet, ModelViewSetBase):
+class TbprodutoViewSet(ModelViewSet):
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
+    filter_fields = '__all__'
     serializer_class = TbprodutoSerializer
     search_fields = ('codigo', 'descricao')
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return Tbproduto.objects_per_user.all(self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(id_contribuinte=self.request.user.id_contribuinte)
+
+    # def __init__(self, *args, **kwargs):
+    #     super(TbprodutoViewSet, self).__init__(*args, **kwargs)
+    #     self.fields['id_contribuinte'] = self.request.user.id_contribuinte
 
 
 # Views Movimentos

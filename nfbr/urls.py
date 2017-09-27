@@ -22,11 +22,14 @@ produto = "produto"
 router = routers.DefaultRouter(trailing_slash=True)
 router.register(r'alterar_contribuinte', TbcontribuinteViewSet, base_name='alterar_contribuinte')
 router.register(unidade_medida, TbunidadeMedidaViewSet)
+router.register("lookups/" + unidade_medida, TbunidadeMedidaLookupViewSet)
 router.register(uf, TbufViewSet)
 router.register(cst, TbcstViewSet)
+router.register("lookups/" + cst, TbcstLookupViewSet, cst)
 router.register(ncm, TbncmViewSet)
 router.register("lookups/" + ncm, TbncmLookupViewSet)
 router.register(cfop, TbcfopViewSet)
+router.register("lookups/" + cfop, TbcfopLookupViewSet)
 router.register(produto, TbprodutoViewSet, produto)
 
 urlpatterns = [

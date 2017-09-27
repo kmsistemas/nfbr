@@ -45,6 +45,7 @@ class Tbcfop(CustomModel, models.Model):
         db_table = 'tbcfop'
         verbose_name = 'cfop'
         verbose_name_plural = 'cfops'
+        ordering = ('codigo',)
 
     def __str__(self):
         return self.codigo
@@ -139,6 +140,7 @@ class Tbcontribuinte(CustomModel, models.Model):
         db_table = 'tbcontribuinte'
         verbose_name = 'contribuinte'
         verbose_name_plural = 'contribuintes'
+        ordering = ('razao',)
 
     def __str__(self):
         return self.razao
@@ -242,6 +244,7 @@ class Tbcst(CustomModel, models.Model):
         unique_together = (('codigo', 'tipo'),)
         verbose_name = 'cst'
         verbose_name_plural = 'csts'
+        ordering = ('tipo', 'codigo')
 
     def __str__(self):
         return "{} - {}".format(self.codigo, self.descricao)
@@ -277,6 +280,7 @@ class TbentradaNf(CustomModel, models.Model):
         db_table = 'tbentrada_nf'
         verbose_name = 'entrada de nota'
         verbose_name_plural = 'entrada de notas'
+        ordering = ('data_nf',)
 
     def __str__(self):
         return self.id_entrada_nf
@@ -693,6 +697,7 @@ class Tbproduto(CustomModel, models.Model):
         unique_together = (('id_contribuinte', 'codigo'), ('id_contribuinte', 'descricao'),)
         verbose_name = 'produto'
         verbose_name_plural = 'produtos'
+        ordering = ('codigo',)
 
     def __str__(self):
         return self.descricao

@@ -63,9 +63,16 @@ class TbcontribuinteManager(models.Manager):
 
 
 class ModelPerUserManager(models.Manager):
-    def all(self, user):
-        filtro = Q(id_contribuinte=user.id_contribuinte)
-        if not user.is_superuser:
+    def all(self, user=None):
+        _id_contribuinte = None
+        _is_superuser = None
+
+        if user:
+            _id_contribuinte = user.id_contribuinte
+            _is_superuser = user.is_superuser
+
+        filtro = Q(id_contribuinte=_id_contribuinte)
+        if not _is_superuser:
             filtro &= Q(id_contribuinte__tbusuariocontribuinte__id_usuario=user)
 
         return super().get_queryset().filter(filtro)
